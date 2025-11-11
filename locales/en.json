@@ -1,0 +1,59 @@
+{
+  "common": {
+    "back": "Back",
+    "and": "and"
+  },
+  "choose": {
+    "createAccount": "Create Account",
+    "logIn": "Log In"
+  },
+  "login": {
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "loginBtn": "Log In",
+    "registerBtn": "Register",
+    "agreePrefix": "I have read and agree to",
+    "titleTagline": "All your pet's needs, in one place."
+  },
+  "legal": {
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy"
+  },
+  "toast": {
+    "agreeRequired": "Please agree to Terms and Privacy Policy first",
+    "enterUsernamePassword": "Please enter username and password",
+    "userNotFound": "User not found, please register first",
+    "wrongPassword": "Incorrect password",
+    "passwordTooShort": "Password must be at least 4 characters",
+    "passwordMismatch": "Passwords do not match",
+    "usernameExists": "Username already exists",
+    "registerSuccess": "Registered successfully"
+  },
+  "pet": {
+    "add": {
+      "title": "Add Pet Profile",
+      "uploadTitle": "Upload Avatar",
+      "uploadSubtitle": "Make your pet's profile shine",
+      "nameLabel": "Pet Name",
+      "namePlaceholder": "Enter the pet's name",
+      "breedLabel": "Breed",
+      "breedPlaceholder": "e.g., British Shorthair, Golden Retriever",
+      "birthdayLabel": "Birthday",
+      "birthdayPlaceholder": "Select",
+      "weightLabel": "Weight",
+      "weightPlaceholder": "e.g., 15",
+      "weightUnit": "kg",
+      "weightUnitKg": "kg",
+      "weightUnitLb": "lb",
+      "genderLabel": "Gender",
+      "genderMale": "Male",
+      "genderFemale": "Female",
+      "saveBtn": "Save and go to Home",
+      "toastNameRequired": "Please enter the pet's name",
+      "toastWeightRequired": "Please enter the pet's weight",
+      "toastWeightInvalid": "Please enter a valid positive number",
+      "toastSaved": "Saved"
+    }
+  }
+}
