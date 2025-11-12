@@ -5,12 +5,20 @@
       "style": { "navigationBarTitleText": "首页" }
     },
     {
+      "path": "pages/health/index",
+      "style": { "navigationBarTitleText": "健康档案" }
+    },
+    {
       "path": "pages/index/index",
       "style": { "navigationBarTitleText": "Peto" }
     },
     {
       "path": "pages/login/index",
       "style": { "navigationBarTitleText": "手机号登录" }
+    },
+    {
+      "path": "pages/pet/index",
+      "style": { "navigationBarTitleText": "宠物报告" }
     },
     {
       "path": "pages/pet/add",
@@ -26,28 +34,34 @@
     }
   ],
   "tabBar": {
-    "color": "#7A7E83",
-    "selectedColor": "#007AFF",
+    "color": "#6B7280",
+    "selectedColor": "#FFA726",
     "backgroundColor": "#FFFFFF",
-    "borderStyle": "black",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/index",
         "text": "首页",
-        "iconPath": "static/logo.png",
-        "selectedIconPath": "static/logo.png"
+        "iconPath": "static/tabber/home-no.png",
+        "selectedIconPath": "static/tabber/home-yes.png"
+      },
+      {
+        "pagePath": "pages/pet/index",
+        "text": "宠物报告",
+        "iconPath": "static/tabber/pets-no.png",
+        "selectedIconPath": "static/tabber/pets-yes.png"
       },
       {
         "pagePath": "pages/history/index",
         "text": "历史记录",
-        "iconPath": "static/logo.png",
-        "selectedIconPath": "static/logo.png"
+        "iconPath": "static/tabber/calendar-no.png",
+        "selectedIconPath": "static/tabber/calendar-yes.png"
       },
       {
         "pagePath": "pages/profile/index",
         "text": "我的",
-        "iconPath": "static/logo.png",
-        "selectedIconPath": "static/logo.png"
+        "iconPath": "static/tabber/settings-no.png",
+        "selectedIconPath": "static/tabber/settings-yes.png"
       }
     ]
   },

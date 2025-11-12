@@ -6,20 +6,20 @@
     </view>
     <view class="tip">轻触屏幕进入</view>
   </view>
-  </template>
+</template>
 
 <script>
 export default {
-  onShow(){
+  onShow() {
     // 自动在 800ms 后跳转
-    setTimeout(()=>{ this.goNext() }, 800)
+    setTimeout(() => { this.goNext() }, 800)
   },
-  methods:{
-    goNext(){
+  methods: {
+    goNext() {
       const user = uni.getStorageSync('user')
       if (!user) { uni.redirectTo({ url: '/pages/login/index' }); return }
       const pets = uni.getStorageSync('pets_' + user.id) || []
-      if (pets && pets.length>0) {
+      if (pets && pets.length > 0) {
         uni.switchTab({ url: '/pages/home/index' })
       } else {
         uni.redirectTo({ url: '/pages/pet/add' })
@@ -37,8 +37,27 @@ export default {
   justify-content: center;
   height: 100vh;
 }
-.logo { height: 200rpx; width: 200rpx; margin-top: 200rpx; margin-bottom: 50rpx; }
-.text-area { display: flex; justify-content: center; }
-.title { font-size: 42rpx; color: #333; font-weight: 600; }
-.tip { color: #888; margin-top: 20rpx; }
+
+.logo {
+  height: 200rpx;
+  width: 200rpx;
+  margin-top: 200rpx;
+  margin-bottom: 50rpx;
+}
+
+.text-area {
+  display: flex;
+  justify-content: center;
+}
+
+.title {
+  font-size: 42rpx;
+  color: #333;
+  font-weight: 600;
+}
+
+.tip {
+  color: #888;
+  margin-top: 20rpx;
+}
 </style>
