@@ -7,7 +7,7 @@
         <view class="flex flex-col items-center justify-center w-full text-center">
           <view class="w-full max-w-[160px] mb-6">
             <view class="w-full bg-center bg-no-repeat bg-cover aspect-square rounded-full flex-1"
-              style="background-image:url('https://lh3.googleusercontent.com/aida-public/AB6AXuC7mD-Zr3fof3N_7XP8ViIdqbj_81UzGvEUAbJx-7DcADnXuLkKE6SthQdOZ1BLrpU-tteFpZf__npDX8Bfz4pG6H3KTczMuaPSBCd2QX2n3K9N3KPRoi3dsuuA_gjyV9AYXtype21hyC2yFUmGu7NsyVzqWk6adcK9tWnYxQ19j15YH_4sEOHeis48-FKE6ofD6K0n1ioyYxmvW2Jj0YfU2FzCREHBUbcvkWcVa_5bj4MGPvV21GiWydIFW2UKqsIIQ5mSQ9Ds3Aw4')">
+              style="background-image:url('https://via.placeholder.com/150')">
             </view>
           </view>
           <view class="mb-10">

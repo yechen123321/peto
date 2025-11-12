@@ -1,880 +1,419 @@
 <template>
-  <view class="bg-light-gray dark:bg-background-dark font-display min-h-screen w-full overflow-x-hidden">
-    <!-- 顶部 App Bar -->
-    <view
-      class="sticky top-0 z-10 flex items-center bg-light-gray dark:bg-background-dark p-4 pb-2 justify-between border-b border-gray-200 dark:border-gray-800">
-      <button class="text-dark-gray dark:text-background-light flex size-10 items-center justify-center"
-        @click="goBack">
-        <text class="material-symbols-outlined text-2xl">arrow_back</text>
-      </button>
-      <text
-        class="text-dark-gray dark:text-background-light text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">{{
-          pet?.name ? $t('health.titleWithName', { name: pet.name }) : $t('health.appTitle') }}</text>
-      <view class="w-10"></view>
-    </view>
-
-    <!-- 宠物信息摘要 -->
-    <view class="flex items-center gap-4 bg-light-gray dark:bg-background-dark px-4 py-4 justify-start">
-      <view class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12" :style="avatarStyle"></view>
-      <text class="text-dark-gray dark:text-background-light text-lg font-semibold leading-normal flex-1 truncate">{{
-        pet?.name || $t('health.unnamedPet') }}</text>
-    </view>
-
-    <!-- 统计与图表卡片 -->
-    <view class="flex overflow-x-auto gap-4 px-4 py-3 snap-x snap-mandatory">
-      <view
-        class="flex min-w-[90%] md:min-w-72 flex-1 flex-col gap-2 p-4 bg-white dark:bg-black/20 rounded-xl snap-center shrink-0">
-        <text class="text-dark-gray dark:text-gray-300 text-base font-medium leading-normal">{{ $t('health.trend') }}</text>
-        <text
-          class="text-dark-gray dark:text-white tracking-light text-[32px] font-bold leading-tight truncate">{{ $t('health.lastTwoWeeks') }}</text>
-        <view class="h-[180px] w-full rounded-md border border-gray-200/80 dark:border-gray-700" id="healthLine"
-          @click="onChartClick('line')"></view>
-      </view>
-      <view
-        class="flex min-w-[90%] md:min-w-72 flex-1 flex-col gap-2 p-4 bg-white dark:bg-black/20 rounded-xl snap-center shrink-0">
-        <text class="text-dark-gray dark:text-gray-300 text-base font-medium leading-normal">{{ $t('health.visitFreq') }}</text>
-        <text
-          class="text-dark-gray dark:text-white tracking-light text-[32px] font-bold leading-tight truncate">{{ $t('health.lastTwoWeeks') }}</text>
-        <view class="h-[180px] w-full rounded-md border border-gray-200/80 dark:border-gray-700" id="visitBar"
-          @click="onChartClick('bar')"></view>
+  <view class="bg-background-light dark:bg-background-dark min-h-screen">
+    <!-- 顶部导航栏 -->
+    <view class="flex items-center justify-between p-4 pb-2 sticky top-0 z-10 bg-background-light dark:bg-background-dark border-b border-gray-200/50 dark:border-white/10">
+      <view class="flex items-center gap-3">
+        <button class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-800" @click="goBack">
+          <text class="material-symbols-outlined !text-base">arrow_back</text>
+        </button>
+        <text class="text-gray-900 dark:text-gray-50 text-lg font-bold">健康报告</text>
       </view>
     </view>
 
-    <!-- 过滤 Chips -->
-    <view class="px-4 py-2">
-      <view class="flex gap-2 pb-2 overflow-x-auto">
-        <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4"
-          :class="filterType === 'all' ? 'bg-warm-orange text-white' : 'bg-white dark:bg-black/20'"
-          @click="setFilterType('all')">
-          <text class="text-sm font-semibold leading-normal">{{ $t('health.filter.all') }}</text>
-        </button>
-        <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4"
-          :class="filterType === 'vaccine' ? 'bg-warm-orange text-white' : 'bg-white dark:bg-black/20'"
-          @click="setFilterType('vaccine')">
-          <text class="text-dark-gray dark:text-gray-300 text-sm font-medium leading-normal">{{ $t('health.filter.vaccine') }}</text>
-        </button>
-        <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4"
-          :class="filterType === 'visit' ? 'bg-warm-orange text-white' : 'bg-white dark:bg-black/20'"
-          @click="setFilterType('visit')">
-          <text class="text-dark-gray dark:text-gray-300 text-sm font-medium leading-normal">{{ $t('health.filter.visit') }}</text>
-        </button>
-        <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4"
-          :class="filterType === 'exam' ? 'bg-warm-orange text-white' : 'bg-white dark:bg-black/20'"
-          @click="setFilterType('exam')">
-          <text class="text-dark-gray dark:text-gray-300 text-sm font-medium leading-normal">{{ $t('health.filter.exam') }}</text>
-        </button>
-        <button
-          class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-black/20 pl-4 pr-3"
-          @click="openFullModal">
-          <text class="text-dark-gray dark:text-gray-300 text-sm font-medium leading-normal">{{ $t('health.filter.filter') }}</text>
-          <text class="material-symbols-outlined text-xl">calendar_month</text>
-        </button>
-      </view>
-    </view>
-
-    <!-- 时间轴（最近 3 条/类型） -->
-    <view class="flex flex-col px-4 pb-24">
-      <view v-for="group in groupedRecent" :key="group.type">
-        <text
-          class="text-dark-gray/60 dark:text-gray-400 text-sm font-bold uppercase tracking-wider py-4 text-center">{{
-            typeLabel(group.type) }}</text>
-        <view v-for="item in group.items" :key="item.id" class="flex gap-4">
-          <view class="relative flex flex-col items-center">
-            <view class="flex items-center justify-center rounded-full h-10 w-10 z-[1]" :class="dotBgClass(group.type)">
-              <text class="material-symbols-outlined text-xl" :class="dotIconClass(group.type)">{{ typeIcon(group.type)
-              }}</text>
-            </view>
-            <view class="w-0.5 flex-1 bg-gray-300 dark:bg-gray-700"></view>
-          </view>
-          <view class="flex-1 pb-8">
-            <view class="flex items-center justify-between">
-              <text class="text-dark-gray dark:text-white font-semibold">{{ maskSummary(item.summary) }}</text>
-              <view class="flex items-center gap-1.5 text-status-green">
-                <view class="h-2 w-2 rounded-full bg-status-green"></view>
-                <text class="text-xs font-medium">{{ $t('health.group.done') }}</text>
+    <!-- 宠物选择器 -->
+    <view class="p-4">
+      <view class="bg-white dark:bg-slate-900 rounded-xl p-4">
+        <view class="flex items-center justify-between mb-3">
+          <text class="text-gray-900 dark:text-gray-50 text-base font-medium">选择宠物</text>
+          <view class="flex items-center gap-2">
+            <picker mode="selector" :range="petNames" :value="selectedPetIndex" @change="onPetChange">
+              <view class="flex items-center gap-2 bg-gray-100 dark:bg-slate-800 px-3 py-2 rounded-lg">
+                <text class="text-gray-900 dark:text-gray-50 text-sm">{{ currentPetName }}</text>
+                <text class="material-symbols-outlined !text-sm text-gray-500">expand_more</text>
               </view>
-            </view>
-            <text class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ formatDate(item.date) }}</text>
-          </view>
-        </view>
-      </view>
-      <view class="flex items-center justify-center pt-2">
-        <button class="flex items-center justify-center h-10 px-4 rounded-xl bg-warm-orange text-white"
-          @click="openFullModal">
-          <text class="text-sm font-semibold leading-normal">{{ $t('health.group.viewAll') }}</text>
-        </button>
-      </view>
-    </view>
-
-    <!-- 全量显示模态框（优化 UI 与筛选交互） -->
-    <view v-if="showFull" class="modal">
-      <view class="modal-card">
-        <view class="modal-header">
-          <text class="material-symbols-outlined header-icon">filter_alt</text>
-          <text class="modal-title">{{ $t('health.modal.filterSearch') }}</text>
-          <button class="icon-btn" @click="closeFullModal"><text class="material-symbols-outlined">close</text></button>
-        </view>
-        <view class="filter-bar">
-          <input class="input" :placeholder="$t('health.modal.searchPlaceholder')" v-model="search" />
-          <view class="select-wrap">
-            <button class="select-btn" @click="toggleTypeDropdown">
-              <text>{{ typeLabel(filterType) }}</text>
-              <text class="material-symbols-outlined">expand_more</text>
-            </button>
-            <view v-if="showTypeDropdown" class="dropdown">
-              <view class="dropdown-item" @click="selectFilterType('all')">{{ $t('health.filter.all') }}</view>
-              <view class="dropdown-item" @click="selectFilterType('vaccine')">{{ $t('health.filter.vaccine') }}</view>
-              <view class="dropdown-item" @click="selectFilterType('visit')">{{ $t('health.filter.visit') }}</view>
-              <view class="dropdown-item" @click="selectFilterType('exam')">{{ $t('health.filter.exam') }}</view>
-            </view>
-          </view>
-          <view class="picker-wrap">
-            <picker mode="date" :value="filterDate" @change="onFilterDateChange">
-              <view class="date-input">{{ filterDate || $t('health.modal.pickDate') }}</view>
             </picker>
           </view>
         </view>
-        <scroll-view scroll-y class="full-list">
-          <view v-for="item in pagedFiltered" :key="item.id" class="item">
-            <view class="dot" :class="item.type"></view>
-            <view class="content">
-              <view class="row">
-                <text class="date">{{ formatDate(item.date) }}</text>
-                <text class="type">{{ typeLabel(item.type) }}</text>
+        
+        <!-- 快速切换按钮 -->
+        <view class="flex gap-2 overflow-x-auto">
+          <view v-for="(pet, index) in pets" :key="pet.id" 
+                class="flex items-center gap-2 px-3 py-2 rounded-lg min-w-max"
+                :class="selectedPetIndex === index ? 'bg-serene-blue text-white' : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300'"
+                @click="selectPet(index)">
+            <view class="w-6 h-6 rounded-full bg-center bg-cover" :style="photoStyle(pet)"></view>
+            <text class="text-sm">{{ pet.name }}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 健康数据内容 -->
+    <view v-if="currentPet" class="px-4 pb-4 space-y-4">
+      <!-- 基本信息概览 -->
+      <view class="bg-white dark:bg-slate-900 rounded-xl p-4">
+        <text class="text-gray-900 dark:text-gray-50 text-lg font-bold mb-3 block">健康概览</text>
+        <view class="grid grid-cols-2 gap-4">
+          <view class="bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
+            <view class="flex items-center gap-2 mb-1">
+              <text class="material-symbols-outlined text-blue-500 !text-sm">scale</text>
+              <text class="text-gray-600 dark:text-gray-400 text-xs">当前体重</text>
+            </view>
+            <text class="text-gray-900 dark:text-gray-50 text-lg font-bold">{{ currentPet.weight || 0 }}kg</text>
+          </view>
+          
+          <view class="bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
+            <view class="flex items-center gap-2 mb-1">
+              <text class="material-symbols-outlined text-green-500 !text-sm">height</text>
+              <text class="text-gray-600 dark:text-gray-400 text-xs">身高</text>
+            </view>
+            <text class="text-gray-900 dark:text-gray-50 text-lg font-bold">{{ currentPet.height || 0 }}cm</text>
+          </view>
+          
+          <view class="bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
+            <view class="flex items-center gap-2 mb-1">
+              <text class="material-symbols-outlined text-purple-500 !text-sm">favorite</text>
+              <text class="text-gray-600 dark:text-gray-400 text-xs">健康状态</text>
+            </view>
+            <text class="text-gray-900 dark:text-gray-50 text-lg font-bold">{{ healthStatus }}</text>
+          </view>
+          
+          <view class="bg-gray-50 dark:bg-slate-800 rounded-lg p-3">
+            <view class="flex items-center gap-2 mb-1">
+              <text class="material-symbols-outlined text-orange-500 !text-sm">local_hospital</text>
+              <text class="text-gray-600 dark:text-gray-400 text-xs">疫苗状态</text>
+            </view>
+            <text class="text-gray-900 dark:text-gray-50 text-lg font-bold">{{ vaccinationStatus }}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 体重趋势 -->
+      <view class="bg-white dark:bg-slate-900 rounded-xl p-4">
+        <view class="flex items-center justify-between mb-3">
+          <text class="text-gray-900 dark:text-gray-50 text-lg font-bold">体重趋势</text>
+          <button class="text-serene-blue text-sm" @click="addWeightRecord">记录体重</button>
+        </view>
+        <view class="h-32 bg-gray-50 dark:bg-slate-800 rounded-lg flex items-center justify-center">
+          <view class="text-center">
+            <text class="material-symbols-outlined text-gray-400 text-2xl">trending_up</text>
+            <text class="text-gray-500 dark:text-gray-400 text-sm block mt-2">体重趋势图表</text>
+            <text class="text-gray-400 dark:text-gray-500 text-xs">最近{{ weightRecords.length }}条记录</text>
+          </view>
+        </view>
+        <view v-if="weightRecords.length > 0" class="mt-3 space-y-2">
+          <view v-for="record in weightRecords.slice(-3)" :key="record.id" class="flex items-center justify-between py-1">
+            <text class="text-gray-600 dark:text-gray-400 text-sm">{{ formatDate(record.date) }}</text>
+            <text class="text-gray-900 dark:text-gray-50 text-sm font-medium">{{ record.weight }}kg</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 疫苗接种记录 -->
+      <view class="bg-white dark:bg-slate-900 rounded-xl p-4">
+        <view class="flex items-center justify-between mb-3">
+          <text class="text-gray-900 dark:text-gray-50 text-lg font-bold">疫苗接种</text>
+          <button class="text-serene-blue text-sm" @click="addVaccination">添加记录</button>
+        </view>
+        <view class="space-y-3">
+          <view v-if="vaccinations.length > 0" class="space-y-3">
+            <view v-for="vaccination in vaccinations.slice(-3)" :key="vaccination.id" 
+                  class="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-800 rounded-lg">
+              <view>
+                <text class="text-gray-900 dark:text-gray-50 text-sm font-medium block">{{ vaccination.name }}</text>
+                <text class="text-gray-600 dark:text-gray-400 text-xs">{{ formatDate(vaccination.date) }}</text>
               </view>
-              <text class="summary">{{ maskSummary(item.summary) }}</text>
+              <view class="flex items-center gap-1">
+                <view class="w-2 h-2 rounded-full" :class="vaccination.nextDue && vaccination.nextDue > Date.now() ? 'bg-green-500' : 'bg-red-500'"></view>
+                <text class="text-gray-600 dark:text-gray-400 text-xs">{{ vaccination.nextDue && vaccination.nextDue > Date.now() ? '有效' : '需补种' }}</text>
+              </view>
             </view>
           </view>
-          <view class="pagination">
-            <button class="btn" @click="prevPage" :disabled="page <= 1">{{ $t('health.modal.prevPage') }}</button>
-            <text class="page-info">{{ page }} / {{ totalPages }}</text>
-            <button class="btn" @click="nextPage" :disabled="page >= totalPages">{{ $t('health.modal.nextPage') }}</button>
+          <view v-else class="text-gray-500 dark:text-gray-400 text-sm text-center py-4">
+            暂无疫苗接种记录
           </view>
-        </scroll-view>
-        <view class="modal-actions">
-          <button class="btn" @click="closeFullModal">{{ $t('health.modal.close') }}</button>
         </view>
       </view>
-    </view>
 
-    <!-- 新增记录模态框 -->
-    <view v-if="showAdd" class="modal">
-      <view class="modal-card">
-        <view class="modal-header">
-          <text class="material-symbols-outlined header-icon">add_circle</text>
-          <text class="modal-title">{{ $t('health.addModal.title') }}</text>
-          <button class="icon-btn" @click="closeAddModal"><text class="material-symbols-outlined">close</text></button>
-        </view>
-        <view class="add-filter-bar">
-          <view class="select-wrap">
-            <button class="select-btn" @click="toggleAddTypeDropdown">
-              <text>{{ typeLabel(newRecord.type) }}</text>
-              <text class="material-symbols-outlined">expand_more</text>
-            </button>
-            <view v-if="showAddTypeDropdown" class="dropdown">
-              <view class="dropdown-item" @click="selectAddType('vaccine')">{{ $t('health.addModal.type.vaccine') }}</view>
-              <view class="dropdown-item" @click="selectAddType('visit')">{{ $t('health.addModal.type.visit') }}</view>
-              <view class="dropdown-item" @click="selectAddType('exam')">{{ $t('health.addModal.type.exam') }}</view>
+      <!-- 健康评估 -->
+      <view class="bg-white dark:bg-slate-900 rounded-xl p-4">
+        <text class="text-gray-900 dark:text-gray-50 text-lg font-bold mb-3 block">健康评估</text>
+        <view class="bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 rounded-lg p-4">
+          <view class="flex items-start gap-3">
+            <text class="material-symbols-outlined text-green-500 text-xl">health_and_safety</text>
+            <view class="flex-1">
+              <text class="text-gray-900 dark:text-gray-50 text-sm font-medium block mb-1">{{ healthAssessment.title }}</text>
+              <text class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">{{ healthAssessment.description }}</text>
             </view>
           </view>
-          <view class="picker-wrap">
-            <picker mode="date" :value="newRecord.date" @change="onDateChange">
-              <view class="date-input">{{ newRecord.date || $t('health.addModal.pickDate') }}</view>
-            </picker>
+        </view>
+        
+        <view class="mt-4 space-y-2">
+          <text class="text-gray-900 dark:text-gray-50 text-sm font-medium block">建议</text>
+          <view v-for="(suggestion, index) in healthSuggestions" :key="index" class="flex items-start gap-2">
+            <view class="w-1 h-1 rounded-full bg-serene-blue mt-2 flex-shrink-0"></view>
+            <text class="text-gray-700 dark:text-gray-300 text-xs leading-relaxed">{{ suggestion }}</text>
           </view>
         </view>
-        <view class="form-body">
-          <textarea class="input textarea" :placeholder="$t('health.addModal.summaryPlaceholder')" v-model="newRecord.summary"></textarea>
+      </view>
+
+      <!-- 最近检查记录 -->
+      <view class="bg-white dark:bg-slate-900 rounded-xl p-4">
+        <view class="flex items-center justify-between mb-3">
+          <text class="text-gray-900 dark:text-gray-50 text-lg font-bold">最近检查</text>
+          <button class="text-serene-blue text-sm" @click="addCheckup">添加记录</button>
         </view>
-        <view class="modal-actions">
-          <button class="btn" @click="closeAddModal">{{ $t('health.addModal.cancel') }}</button>
-          <button class="btn primary" @click="submitAddRecord">{{ $t('health.addModal.save') }}</button>
+        <view class="space-y-3">
+          <view v-if="recentCheckups.length > 0" class="space-y-3">
+            <view v-for="checkup in recentCheckups.slice(0, 2)" :key="checkup.id" 
+                  class="p-3 bg-gray-50 dark:bg-slate-800 rounded-lg">
+              <view class="flex items-center justify-between mb-2">
+                <text class="text-gray-900 dark:text-gray-50 text-sm font-medium">{{ checkup.type }}</text>
+                <text class="text-gray-600 dark:text-gray-400 text-xs">{{ formatDate(checkup.date) }}</text>
+              </view>
+              <text class="text-gray-600 dark:text-gray-400 text-xs leading-relaxed">{{ checkup.notes }}</text>
+            </view>
+          </view>
+          <view v-else class="text-gray-500 dark:text-gray-400 text-sm text-center py-4">
+            暂无检查记录
+          </view>
         </view>
       </view>
-    </view>
-
-    <!-- 悬浮添加按钮 -->
-    <view class="fixed bottom-6 right-6">
-      <button class="flex items-center justify-center w-14 h-14 bg-warm-orange rounded-xl shadow-lg"
-        @click="openAddModal">
-        <text class="material-symbols-outlined text-white text-3xl">add</text>
-      </button>
     </view>
   </view>
 </template>
 
 <script>
+import { applyTabBarLocale } from '../../i18n/index.js'
+import { DataManager } from '../../utils/dataModels.js'
+import { TouchFeedback } from '../../utils/touchFeedback.js'
+
 export default {
   data() {
     return {
-      petId: null,
-      pet: null,
-      activeTab: 'vaccine',
-      tabs: [
-        { key: 'vaccine', label: '疫苗', icon: 'vaccines' },
-        { key: 'visit', label: '就诊', icon: 'monitor_heart' },
-        { key: 'exam', label: '体检', icon: 'labs' }
-      ],
-      // 图表懒加载标记
-      chartsReady: false,
-      // 时间轴数据
-      records: [],
-      showFull: false,
-      showAdd: false,
-      search: '',
-      filterType: 'all',
-      filterDate: '',
-      page: 1,
-      pageSize: 10,
-      showTypeDropdown: false,
-      showAddTypeDropdown: false,
-      newRecord: { type: 'visit', date: '', summary: '' },
+      pets: [],
+      selectedPetIndex: 0,
+      user: null,
+      weightRecords: [],
+      vaccinations: [],
+      recentCheckups: []
     }
   },
-  onLoad(query) {
-    this.petId = query?.petId || null
+  onLoad(options) {
+    const petId = options.petId || ''
+    if (petId) {
+      this.petId = petId
+    }
   },
   onShow() {
     const user = uni.getStorageSync('user')
-    if (!user) { uni.redirectTo({ url: '/pages/login/index' }); return }
-    const pets = uni.getStorageSync('pets_' + user.id) || []
-    this.pet = pets.find(p => p.id == this.petId) || pets[0] || null
-    // 更新页面导航标题（即使使用自定义 AppBar，也保证系统标题一致）
-    try { uni.setNavigationBarTitle({ title: this.pet?.name ? this.$t('health.titleWithName', { name: this.pet.name }) : this.$t('nav.health') }) } catch (e) {}
-    this.loadRecords(user)
-    this.lazyLoadCharts()
+    if (!user) {
+      uni.redirectTo({ url: '/pages/login/index' })
+      return
+    }
+    this.user = user
+    try { uni.setNavigationBarTitle({ title: '健康报告' }) } catch (e) {}
+    try { const locale = uni.getStorageSync('locale') || (this.$i18n ? this.$i18n.locale : 'en'); applyTabBarLocale(locale) } catch (e) {}
+    
+    this.loadPets()
+    this.loadHealthData()
+    
+    // 添加触摸反馈
+    this.$nextTick(() => {
+      this.addTouchFeedback()
+    })
+  },
+  mounted() {
+    this.addTouchFeedback()
   },
   computed: {
-    avatarStyle() {
-      const url = this.pet?.photo || this.pet?.avatar || this.pet?.photoUrl || ''
-      return url ? `background-image: url('${url}');` : ''
+    currentPet() {
+      return this.pets[this.selectedPetIndex] || null
     },
-    groupedRecent() {
-      const types = this.filterType === 'all' ? ['vaccine', 'visit', 'exam'] : [this.filterType]
-      return types.map(type => ({
-        type,
-        items: this.records
-          .filter(r => r.type === type)
-          .sort((a, b) => b.date - a.date)
-          .slice(0, 3)
-      }))
+    currentPetName() {
+      return this.currentPet ? this.currentPet.name : '选择宠物'
     },
-    filterTypes() { return [this.$t('health.filter.all'), this.$t('health.filter.vaccine'), this.$t('health.filter.visit'), this.$t('health.filter.exam')] },
-    filteredList() {
-      const s = (this.search || '').trim().toLowerCase()
-      const type = this.filterType
-      const dateStr = (this.filterDate || '').trim()
-      let start = null, end = null
-      if (dateStr) { const d = new Date(dateStr); start = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); end = start + 86400000 }
-      return this.records.filter(r => {
-        const byType = (type === 'all' || r.type === type)
-        const byText = (!s || (r.summary || '').toLowerCase().includes(s))
-        const byDate = (!start || (r.date >= start && r.date < end))
-        return byType && byText && byDate
-      })
+    petNames() {
+      return this.pets.map(pet => pet.name)
     },
-    totalPages() { return Math.max(1, Math.ceil(this.filteredList.length / this.pageSize)) },
-    pagedFiltered() {
-      const start = (this.page - 1) * this.pageSize
-      return this.filteredList.slice(start, start + this.pageSize)
+    healthStatus() {
+      if (!this.currentPet) return '未知'
+      // 基于体重、疫苗等数据计算健康状态
+      const hasRecentVaccination = this.vaccinations.some(v => 
+        v.date > Date.now() - 365 * 24 * 3600 * 1000 && v.nextDue > Date.now()
+      )
+      return hasRecentVaccination ? '良好' : '需关注'
     },
+    vaccinationStatus() {
+      if (!this.currentPet || this.vaccinations.length === 0) return '未接种'
+      const recentVaccinations = this.vaccinations.filter(v => v.nextDue > Date.now())
+      return recentVaccinations.length > 0 ? '已接种' : '需补种'
+    },
+    healthAssessment() {
+      if (!this.currentPet) {
+        return {
+          title: '请先选择宠物',
+          description: '选择宠物后查看健康评估'
+        }
+      }
+      
+      const weight = this.currentPet.weight || 0
+      const age = this.getAgeInYears(this.currentPet.birthday)
+      
+      let title = '健康状态良好'
+      let description = '您的宠物各项指标正常，继续保持良好的护理习惯。'
+      
+      if (weight < 5 && age > 1) {
+        title = '体重偏轻'
+        description = '建议增加营养摄入，定期检查体重变化。'
+      } else if (weight > 15 && age > 1) {
+        title = '体重偏重'
+        description = '建议控制饮食，增加运动量。'
+      }
+      
+      return { title, description }
+    },
+    healthSuggestions() {
+      if (!this.currentPet) return []
+      
+      const suggestions = []
+      const weight = this.currentPet.weight || 0
+      const age = this.getAgeInYears(this.currentPet.birthday)
+      
+      if (weight < 5 && age > 1) {
+        suggestions.push('增加高质量蛋白质的摄入')
+        suggestions.push('定期称重监控体重变化')
+      } else if (weight > 15 && age > 1) {
+        suggestions.push('减少高热量零食')
+        suggestions.push('增加日常运动时间')
+      }
+      
+      if (age > 7) {
+        suggestions.push('定期体检，关注老年疾病')
+        suggestions.push('适当减少运动强度')
+      }
+      
+      const hasRecentVaccination = this.vaccinations.some(v => 
+        v.date > Date.now() - 365 * 24 * 3600 * 1000
+      )
+      if (!hasRecentVaccination) {
+        suggestions.push('及时接种疫苗')
+      }
+      
+      return suggestions.length > 0 ? suggestions : ['继续保持良好的护理习惯']
+    }
   },
   methods: {
-    goBack() { uni.navigateBack() },
-    typeLabel(type) { return type === 'vaccine' ? this.$t('health.filter.vaccine') : type === 'visit' ? this.$t('health.filter.visit') : type === 'exam' ? this.$t('health.filter.exam') : this.$t('health.filter.all') },
-    typeIcon(type) { return type === 'vaccine' ? 'vaccines' : type === 'visit' ? 'monitor_heart' : 'labs' },
-    formatDate(ts) { if (!ts) return this.$t('health.notSet') || this.$t('common.notSet'); const d = new Date(ts); const y = d.getFullYear(), m = (d.getMonth() + 1).toString().padStart(2, '0'), day = d.getDate().toString().padStart(2, '0'); return `${y}-${m}-${day}` },
-    maskSummary(text) { if (!text) return ''; return String(text).replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') },
-    switchTab(key) { this.activeTab = key; this.microInteract() },
-    microInteract() { try { if (typeof window !== 'undefined') { const el = document.activeElement; if (el) el.blur() } } catch (e) { } },
-    toggleExpand(item) { item.expanded = !item.expanded; this.microInteract() },
-    openFullModal() { this.showFull = true; this.page = 1 },
-    closeFullModal() { this.showFull = false },
-    openAddModal() { const now = Date.now(); this.newRecord = { type: 'visit', date: this.formatDateOnly(now), summary: '' }; this.showAdd = true },
-    closeAddModal() { this.showAdd = false },
-    toggleTypeDropdown() { this.showTypeDropdown = !this.showTypeDropdown },
-    selectFilterType(t) { this.filterType = t; this.page = 1; this.showTypeDropdown = false },
-    toggleAddTypeDropdown() { this.showAddTypeDropdown = !this.showAddTypeDropdown },
-    selectAddType(t) { this.newRecord.type = t; this.showAddTypeDropdown = false },
-    setFilterType(t) { this.filterType = t; this.page = 1 },
-    onTypeFilterChange(e) { const idx = e.detail.value; this.filterType = idx == 0 ? 'all' : (idx == 1 ? 'vaccine' : idx == 2 ? 'visit' : 'exam'); this.page = 1 },
-    prevPage() { if (this.page > 1) this.page-- },
-    nextPage() { if (this.page < this.totalPages) this.page++ },
-    onChartClick(kind) { uni.showToast({ title: kind === 'line' ? this.$t('health.toast.trendPoint') : this.$t('health.toast.freqBar'), icon: 'none', duration: 1200 }) },
-    formatDateOnly(ts) { const d = new Date(ts); const y = d.getFullYear(); const m = (d.getMonth() + 1).toString().padStart(2, '0'); const day = d.getDate().toString().padStart(2, '0'); return `${y}-${m}-${day}` },
-    onDateChange(e) { this.newRecord.date = e?.detail?.value || '' },
-    onFilterDateChange(e) { this.filterDate = e?.detail?.value || ''; this.page = 1 },
-    async submitAddRecord() {
-      const { type, date, summary } = this.newRecord
-      if (!summary || !summary.trim()) { uni.showToast({ title: this.$t('health.toast.enterSummary'), icon: 'none' }); return }
-      const ts = date ? new Date(date).getTime() : Date.now()
-      const rec = { id: Date.now() + Math.random(), date: ts, type, summary: summary.trim(), expanded: false }
-      this.records = [rec, ...this.records]
-      try {
-        const user = uni.getStorageSync('user')
-        const key = `healthRecords_${user.id}_${this.pet?.id || 'unknown'}`
-        uni.setStorageSync(key, this.records)
-      } catch (e) { }
-      uni.showToast({ title: this.$t('health.toast.added'), icon: 'success', duration: 1200 })
-      this.closeAddModal()
-    },
-    onTimeChange(e) { this.newRecord.time = e?.detail?.value || '' },
-    loadRecords(user) {
-      const key = `healthRecords_${user.id}_${this.pet?.id || 'unknown'}`
-      const list = uni.getStorageSync(key)
-      if (Array.isArray(list) && list.length > 0) {
-        this.records = list
-        return
-      }
-      // 构造演示数据（脱敏）
-      const now = Date.now()
-      const mk = (offset, type, summary) => ({ id: now + Math.random(), date: now - offset * 86400000, type, summary, expanded: false })
-      this.records = [
-        mk(3, 'vaccine', '疫苗加强：狂犬疫苗第2针'),
-        mk(10, 'visit', '就诊：轻微皮炎治疗'),
-        mk(18, 'exam', '体检：血常规指标正常'),
-        mk(30, 'vaccine', '疫苗接种：五联第一针'),
-        mk(42, 'visit', '就诊：胃肠不适处理'),
-        mk(53, 'exam', '体检：体重、心率稳定'),
-        mk(65, 'visit', '就诊：皮毛护理建议'),
-        mk(80, 'exam', '体检：影像学检查正常'),
-        mk(95, 'vaccine', '疫苗接种：免疫计划启动')
-      ]
-    },
-    async lazyLoadCharts() {
-      if (this.chartsReady) return
-      // 延迟加载 ECharts，降低首屏压力
-      setTimeout(async () => {
-        if (typeof window !== 'undefined') {
-          await this.ensureEcharts()
-          this.initCharts()
-          this.chartsReady = true
+    loadPets() {
+      this.pets = DataManager.loadData(this.user.id, 'pets')
+      
+      // 如果有指定petId，找到对应的索引
+      if (this.petId) {
+        const index = this.pets.findIndex(pet => pet.id === this.petId)
+        if (index !== -1) {
+          this.selectedPetIndex = index
         }
-      }, 300)
+      }
     },
-    ensureEcharts() {
-      return new Promise((resolve) => {
-        if (window.echarts) { resolve(); return }
-        const s = document.createElement('script')
-        s.src = 'https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js'
-        s.onload = () => resolve()
-        s.onerror = () => resolve() // 失败时不阻塞
-        document.head.appendChild(s)
+    loadHealthData() {
+      // 加载体重记录
+      this.weightRecords = DataManager.loadData(this.user.id, 'weightRecords')
+      
+      // 加载疫苗记录
+      this.vaccinations = DataManager.loadData(this.user.id, 'vaccinations')
+      
+      // 加载检查记录
+      this.recentCheckups = DataManager.loadData(this.user.id, 'checkups')
+    },
+    onPetChange(e) {
+      this.selectedPetIndex = parseInt(e.detail.value)
+      this.updateCurrentPetHealthData()
+    },
+    selectPet(index) {
+      this.selectedPetIndex = index
+      this.updateCurrentPetHealthData()
+    },
+    updateCurrentPetHealthData() {
+      // 可以在这里添加更新当前宠物健康数据的逻辑
+      uni.showToast({ title: `已选择 ${this.currentPetName}`, icon: 'none' })
+    },
+    addWeightRecord() {
+      uni.showToast({ title: '体重记录功能开发中', icon: 'none' })
+    },
+    addVaccination() {
+      uni.showToast({ title: '疫苗记录功能开发中', icon: 'none' })
+    },
+    addCheckup() {
+      uni.showToast({ title: '检查记录功能开发中', icon: 'none' })
+    },
+    goBack() {
+      uni.navigateBack()
+    },
+    photoStyle(pet) {
+      const url = pet.photo || pet.avatar || pet.photoUrl || ''
+      return url ? `background-image: url('${url}');` : 'background-color: #f3f4f6;'
+    },
+    formatDate(ts) {
+      if (!ts) return '未设置'
+      const d = new Date(ts)
+      const y = d.getFullYear()
+      const m = (d.getMonth() + 1).toString().padStart(2, '0')
+      const day = d.getDate().toString().padStart(2, '0')
+      return `${y}-${m}-${day}`
+    },
+    getAgeInYears(birthday) {
+      if (!birthday) return 0
+      const d = new Date(birthday)
+      if (isNaN(d.getTime())) return 0
+      const now = new Date()
+      let years = now.getFullYear() - d.getFullYear()
+      const m = now.getMonth() - d.getMonth()
+      const da = now.getDate() - d.getDate()
+      if (m < 0 || (m === 0 && da < 0)) years--
+      return years
+    },
+    addTouchFeedback() {
+      // 为按钮添加触摸反馈
+      const buttons = this.$el.querySelectorAll('button')
+      buttons.forEach(button => {
+        TouchFeedback.addTouchFeedback(button, {
+          scale: 0.95,
+          duration: 150
+        })
       })
-    },
-    initCharts() {
-      try {
-        const echarts = window.echarts
-        if (!echarts) return
-        const lineEl = document.getElementById('healthLine')
-        const barEl = document.getElementById('visitBar')
-        if (!lineEl || !barEl) return
-        const lineChart = echarts.init(lineEl)
-        const barChart = echarts.init(barEl)
-        const days = Array.from({ length: 14 }, (_, i) => `D${i + 1}`)
-        const trend = days.map((_, i) => (80 + Math.round(10 * Math.sin(i / 2))))
-        const visits = days.map(() => Math.floor(Math.random() * 3))
-        lineChart.setOption({
-          grid: { left: 8, right: 8, top: 24, bottom: 24 },
-          tooltip: { trigger: 'axis' },
-          xAxis: { type: 'category', data: days },
-          yAxis: { type: 'value' },
-          series: [{ type: 'line', data: trend, smooth: true, itemStyle: { color: '#1E88E5' } }]
-        })
-        barChart.setOption({
-          grid: { left: 8, right: 8, top: 24, bottom: 24 },
-          tooltip: { trigger: 'axis' },
-          xAxis: { type: 'category', data: days },
-          yAxis: { type: 'value' },
-          series: [{ type: 'bar', data: visits, itemStyle: { color: '#43A047' } }]
-        })
-        lineChart.on('click', (p) => this.onChartClick('line'))
-        barChart.on('click', (p) => this.onChartClick('bar'))
-      } catch (e) { }
-    },
-    dotBgClass(type) {
-      return type === 'vaccine' ? 'bg-serene-blue/20 dark:bg-serene-blue/30' :
-        type === 'visit' ? 'bg-warm-orange/20 dark:bg-warm-orange/30' :
-          'bg-serene-blue/20 dark:bg-serene-blue/30'
-    },
-    dotIconClass(type) {
-      return type === 'vaccine' ? 'text-serene-blue' :
-        type === 'visit' ? 'text-warm-orange' :
-          'text-serene-blue'
     }
   }
 }
 </script>
 
 <style>
-.page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px;
+.bg-serene-blue {
+  background-color: #3b82f6;
 }
-
-.header {
-  display: flex;
-  gap: 16px;
-  align-items: center;
+.text-serene-blue {
+  color: #3b82f6;
 }
-
-.avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 60px;
-  background: #eef3fb;
-  background-size: cover;
-  background-position: center;
+.bg-warm-orange {
+  background-color: #f97316;
 }
-
-.header-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.text-warm-orange {
+  color: #f97316;
 }
-
-.pet-name {
-  font-size: 24px;
-  font-weight: 700;
-  color: #1c1c1e;
+.text-error-red {
+  color: #ef4444;
 }
-
-.tabs {
-  display: flex;
-  gap: 8px;
+.bg-neutral-card {
+  background-color: #ffffff;
 }
-
-.tab {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid #e5e7eb;
-  color: #374151;
-  transition: all 0.2s ease;
+.dark .bg-neutral-card {
+  background-color: #1f2937;
 }
-
-.tab.active {
-  background: #e8f1fb;
-  border-color: #1E88E5;
-  color: #1E88E5;
-}
-
-.icon {
-  font-size: 18px;
-}
-
-.charts {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.chart {
-  height: 180px;
-  background: #fff;
-  border: 1px solid #eee;
-  border-radius: 8px;
-}
-
-.timeline {
-  margin-top: 16px;
-}
-
-.group-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #1E88E5;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.items {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.item {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  padding: 8px;
-  border-radius: 8px;
-  background: #fff;
-  border: 1px solid #eee;
-  transition: background 0.2s ease;
-}
-
-.item:active {
-  background: #f7fbff;
-}
-
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 6px;
-  margin-top: 6px;
-}
-
-.dot.vaccine {
-  background: #1E88E5;
-}
-
-.dot.visit {
-  background: #43A047;
-}
-
-.dot.exam {
-  background: #5b99e5;
-}
-
-.content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.date {
-  color: #6b7280;
-  font-size: 14px;
-}
-
-.summary {
-  color: #374151;
-  max-height: 2.8em;
-  overflow: hidden;
-}
-
-.summary.expanded {
-  max-height: none;
-}
-
-.arrow {
-  color: #6b7280;
-}
-
-.see-all {
-  display: flex;
-  justify-content: center;
-  margin-top: 12px;
-}
-
-.btn {
-  padding: 8px 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  height: 44px;
-  font-size: 15px;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn.primary {
-  background: #FFA726;
-  color: #fff;
-  border-color: #FFA726;
-}
-
-.modal-actions .btn {
-  min-width: 120px;
-}
-
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, .35);
-  backdrop-filter: blur(2px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-}
-
-.modal-card {
-  width: 92%;
-  max-width: 380px;
-  background: #fff;
-  border-radius: 16px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  position: relative;
-  z-index: 201;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
-  border: 1px solid #e5e7eb;
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.header-icon {
-  color: #6b7280;
-  font-size: 20px;
-}
-
-.modal-title {
-  flex: 1;
-  text-align: center;
-  font-weight: 600;
-  color: #1c1c1e;
-}
-
-/* header-actions 已移除日期，仅保留关闭按钮，无需特殊布局 */
-
-.date-input {
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 10px 12px;
-  height: 40px;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  color: #374151;
-  z-index: 1102;
-  transition: box-shadow .15s ease, border-color .15s ease;
-}
-
-.icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-}
-
-.filter-bar {
-  display: flex;
-  gap: 8px;
-  position: relative;
-}
-
-/* 让筛选弹框中的类型与日期横向填满并统一视觉 */
-.filter-bar .select-wrap {
-  flex: 1;
-}
-
-.filter-bar .picker-wrap {
-  flex: 1.1;
-}
-
-.filter-bar .select-btn {
-  width: 100%;
-  justify-content: space-between;
-}
-
-.filter-bar .date-input {
-  width: 100%;
-}
-
-.filter-bar .select-wrap .dropdown {
-  width: 100%;
-  min-width: 100%;
-}
-
-.add-filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  position: relative;
-  padding-top: 4px;
-}
-
-.select-wrap {
-  position: relative;
-}
-
-.input {
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 10px 12px;
-  height: 40px;
-  font-size: 15px;
-  background: #fff;
+.text-neutral-text-primary {
   color: #111827;
-  box-sizing: border-box;
-  flex: 1;
-  transition: box-shadow .15s ease, border-color .15s ease;
 }
-
-.select-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 10px 12px;
-  background: #fff;
-  color: #374151;
-  transition: box-shadow .15s ease, border-color .15s ease;
+.dark .text-neutral-text-primary {
+  color: #f9fafb;
 }
-
-.dropdown {
-  position: absolute;
-  top: 42px;
-  left: 0;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
-  z-index: 1100;
-  min-width: 160px;
-  overflow: hidden;
-}
-
-.dropdown-item {
-  padding: 10px 12px;
-  color: #374151;
-}
-
-.dropdown-item:active {
-  background: #f9fafb;
-}
-
-.full-list {
-  max-height: 60vh;
-}
-
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 8px 0;
-}
-
-.page-info {
+.text-neutral-text-secondary {
   color: #6b7280;
 }
-
-.form-body {
-  margin-top: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* 统一类型选择与日期选择的视觉尺寸与文字样式 */
-.select-btn,
-.date-input {
-  height: 40px;
-  font-size: 15px;
-}
-
-.select-btn .material-symbols-outlined {
-  font-size: 18px;
-  color: #6b7280;
-}
-
-/* 横向填满：左右控件均占满各自空间 */
-.add-filter-bar {
-  display: flex;
-}
-
-.select-wrap {
-  flex: 1;
-}
-
-.picker-wrap {
-  flex: 2;
-}
-
-.select-btn {
-  width: 100%;
-  justify-content: space-between;
-}
-
-.date-input {
-  width: 100%;
-}
-
-.select-wrap .dropdown {
-  width: 100%;
-  min-width: 100%;
-}
-
-.textarea {
-  min-height: 96px;
-  resize: vertical;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* 焦点与占位样式统一 */
-.input:focus,
-.input:focus-within {
-  outline: none;
-  /* 保留外层边框，借鉴登录页仅加外环的做法 */
-  box-shadow: 0 0 0 2px rgba(255, 167, 38, 0.35);
-}
-
-.input::placeholder {
+.dark .text-neutral-text-secondary {
   color: #9ca3af;
 }
-
-.input .uni-input-wrapper,
-.date-input .uni-input-wrapper {
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  padding: 0 !important;
+.bg-neutral-bg {
+  background-color: #f9fafb;
 }
-
-.input .uni-input-input,
-.date-input .uni-input-input,
-.input input,
-.date-input input {
-  outline: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  background: transparent !important;
-}
-
-.select-btn:focus,
-.select-btn:active,
-.select-btn:focus-within,
-.date-input:focus,
-.date-input:active,
-.date-input:focus-within {
-  /* 保留外层边框，统一为外环高亮 */
-  box-shadow: 0 0 0 2px rgba(255, 167, 38, 0.35);
-}
-
-.modal-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-/* 响应式 */
-@media (min-width: 768px) {
-  .charts {
-    grid-template-columns: 1fr 1fr
-  }
+.dark .bg-neutral-bg {
+  background-color: #374151;
 }
 </style>

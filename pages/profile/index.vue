@@ -5,7 +5,7 @@
     <!-- Profile Summary Card -->
     <view class="flex items-center gap-4 bg-neutral-card dark:bg-zinc-800 p-6 rounded-xl shadow-sm">
       <view class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16 shrink-0"
-        :style="{ backgroundImage: 'url(https://lh3.googleusercontent.com/aida-public/AB6AXuDCSxiXkUIJiaqABDTK18DLKHIpyXXtyLgCUaVxEKvNa7NXOLSZAxpGnZFOAezI7xxj0ZkGV6WXFjMk5KIbnMlFuZTVIXy32Y6naPwzHUHh8cWsP43zRh_25ZsO77kNsfCAJM3IgMEyQKoGwOIct3FHPdKaz41NDhyNtnROH2pA7QvcX6pjHc7NK8P_BkVtrpurr3zRQeOKeGdzQ3p7lHoU6yFxyqS_xwnQltNz1OqRhTAn96fU_h0Gi0-rkx3lFK4v4ltDBTRt6F_p)' }">
+        :style="{ backgroundImage: 'url(https://via.placeholder.com/150)' }">
       </view>
       <view class="flex flex-col justify-center">
         <text class="text-neutral-text-primary dark:text-white text-lg font-bold leading-normal line-clamp-1">{{
@@ -131,6 +131,15 @@
           <text class="material-symbols-outlined text-neutral-text-secondary dark:text-gray-400">chevron_right</text>
         </view>
         <view
+          class="flex items-center gap-4 px-4 min-h-[56px] py-2 justify-between hover:bg-gray-50 dark:hover:bg-zinc-700"
+          @click="showTestDataModal">
+          <view class="flex items-center gap-4">
+            <text class="material-symbols-outlined text-serene-blue">science</text>
+            <text class="text-neutral-text-primary dark:text-white text-base font-medium leading-normal">测试数据管理</text>
+          </view>
+          <text class="material-symbols-outlined text-neutral-text-secondary dark:text-gray-400">chevron_right</text>
+        </view>
+        <view
           class="flex items-center gap-4 px-4 min-h-[56px] py-2 justify-between hover:bg-gray-50 dark:hover:bg-zinc-700">
           <view class="flex items-center gap-4">
             <text class="material-symbols-outlined text-serene-blue">privacy_tip</text>
@@ -157,13 +166,38 @@
         </view>
       </view>
     </view>
+
+    <!-- 测试数据管理模态框 -->
+    <view v-if="showTestModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" @click="closeTestModal">
+      <view class="bg-white dark:bg-slate-900 rounded-xl p-6 w-11/12 max-w-sm" @click.stop>
+        <text class="text-gray-900 dark:text-gray-50 text-lg font-bold mb-4 block">测试数据管理</text>
+        
+        <view class="space-y-4">
+          <text class="text-gray-600 dark:text-gray-400 text-sm">您可以安装测试数据来体验所有功能，或清除现有数据。</text>
+          
+          <view class="flex gap-3">
+            <button class="flex-1 px-4 py-2 bg-serene-blue rounded-lg text-white" @click="installTestData">
+              安装测试数据
+            </button>
+            <button class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300" @click="clearTestData">
+              清除数据
+            </button>
+          </view>
+        </view>
+        
+        <view class="flex justify-end mt-6">
+          <button class="px-4 py-2 text-gray-500 dark:text-gray-400" @click="closeTestModal">取消</button>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
 <script>
 import { applyTabBarLocale } from '../../i18n/index.js'
+import TestDataGenerator from '../../utils/testData.js'
 export default {
-  data() { return { user: null, petCount: 0, currentLocale: 'en', locales: ['zh-CN', 'en'], localeLabels: ['简体中文', 'English'] } },
+  data() { return { user: null, petCount: 0, currentLocale: 'en', locales: ['zh-CN', 'en'], localeLabels: ['简体中文', 'English'], showTestModal: false } },
   onShow() {
     const user = uni.getStorageSync('user')
     if (!user) { uni.redirectTo({ url: '/pages/login/index' }); return }
@@ -198,7 +232,8 @@ export default {
           return `${y}年${mm}月${dd}日`
         }
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        return `${months[m - 1]} ${d}, ${y}`
+        const dd = String(d).padStart(2, '0')
+        return `${months[m - 1]} ${dd}, ${y}`
       }
       return str
     },
@@ -240,6 +275,32 @@ export default {
       const idx = e?.detail?.value
       const target = this.locales[idx] || 'en'
       this.changeLocale(target)
+    },
+    showTestDataModal() {
+      this.showTestModal = true
+    },
+    closeTestModal() {
+      this.showTestModal = false
+    },
+    installTestData() {
+      try {
+        TestDataGenerator.installTestData(this.user.id)
+        this.petCount = 3 // 更新宠物数量
+        uni.showToast({ title: '测试数据安装成功', icon: 'success' })
+        this.closeTestModal()
+      } catch (error) {
+        uni.showToast({ title: '安装失败：' + error.message, icon: 'none' })
+      }
+    },
+    clearTestData() {
+      try {
+        TestDataGenerator.clearTestData(this.user.id)
+        this.petCount = 0 // 更新宠物数量
+        uni.showToast({ title: '测试数据已清除', icon: 'success' })
+        this.closeTestModal()
+      } catch (error) {
+        uni.showToast({ title: '清除失败：' + error.message, icon: 'none' })
+      }
     }
   },
   computed: {

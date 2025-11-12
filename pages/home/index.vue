@@ -50,7 +50,8 @@
                   <text class="truncate">{{ $t('home.viewHealth') }}</text>
                 </button>
                 <button
-                  class="flex-1 flex min-w-0 max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-4 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 text-sm font-bold leading-normal">
+                  class="flex-1 flex min-w-0 max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-4 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 text-sm font-bold leading-normal"
+                  @click="toPetProfile(p)">
                   <text class="truncate">{{ $t('home.viewProfile') }}</text>
                 </button>
               </view>
@@ -74,6 +75,7 @@
 
 <script>
 import { applyTabBarLocale } from '../../i18n/index.js'
+import { DataManager } from '../../utils/dataModels.js'
 const PRESETS = [
   { title: 'home.presets.internalDeworm', cycleDays: 30 },
   { title: 'home.presets.externalDeworm', cycleDays: 30 },
@@ -130,11 +132,16 @@ export default {
       const url = '/pages/health/index' + (id ? ('?petId=' + encodeURIComponent(id)) : '')
       uni.navigateTo({ url, animationType: 'slide-in-right', animationDuration: 200 })
     },
+    toPetProfile(p) {
+      const id = p?.id || (this.pets[0]?.id || '')
+      const url = '/pages/pet/index' + (id ? ('?petId=' + encodeURIComponent(id)) : '')
+      uni.navigateTo({ url, animationType: 'slide-in-right', animationDuration: 200 })
+    },
     loadPets() {
-      this.pets = uni.getStorageSync('pets_' + this.user.id) || []
+      this.pets = DataManager.loadData(this.user.id, 'pets')
     },
     loadReminders() {
-      this.reminders = uni.getStorageSync('reminders_' + this.user.id) || []
+      this.reminders = DataManager.loadData(this.user.id, 'reminders')
     },
     petName(petId) {
       const p = this.pets.find(x => x.id === petId)
@@ -183,10 +190,7 @@ export default {
       }
       const now = Date.now()
       const item = { id: now, title: f.title, cycleDays: Number(f.cycleDays), note: f.note, petId: f.petId, lastDoneAt: null, nextDueAt: now + Number(f.cycleDays) * 24 * 3600 * 1000, preset: false }
-      const key = 'reminders_' + this.user.id
-      const list = uni.getStorageSync(key) || []
-      list.push(item)
-      uni.setStorageSync(key, list)
+      DataManager.addItem(this.user.id, 'reminders', item)
       this.loadReminders()
       this.closeAddReminder()
       uni.showToast({ title: this.$t('home.added'), icon: 'none' })
@@ -194,8 +198,7 @@ export default {
     addPresetBatch() {
       if (this.pets.length === 0) { return }
       const petId = this.reminderForm.petId || this.pets[0].id
-      const key = 'reminders_' + this.user.id
-      const list = uni.getStorageSync(key) || []
+      const list = DataManager.loadData(this.user.id, 'reminders')
       const now = Date.now()
       PRESETS.forEach(p => {
         const displayTitle = this.$t(p.title)
@@ -204,21 +207,18 @@ export default {
           list.push({ id: now + Math.random(), title: displayTitle, cycleDays: p.cycleDays, note: '', petId, lastDoneAt: null, nextDueAt: now + p.cycleDays * 24 * 3600 * 1000, preset: true })
         }
       })
-      uni.setStorageSync(key, list)
+      DataManager.saveData(this.user.id, 'reminders', list)
       this.loadReminders()
       uni.showToast({ title: this.$t('home.presetsAdded'), icon: 'none' })
     },
     markDone(r) {
       r.lastDoneAt = Date.now()
       r.nextDueAt = r.lastDoneAt + r.cycleDays * 24 * 3600 * 1000
-      const key = 'reminders_' + this.user.id
-      const list = (uni.getStorageSync(key) || []).map(x => x.id === r.id ? r : x)
-      uni.setStorageSync(key, list)
+      DataManager.updateItem(this.user.id, 'reminders', r.id, r)
       // 写入历史
-      const hKey = 'history_' + this.user.id
-      const hist = uni.getStorageSync(hKey) || []
+      const hist = DataManager.loadData(this.user.id, 'history')
       hist.unshift({ id: Date.now(), reminderId: r.id, title: r.title, petId: r.petId, petName: this.petName(r.petId), completedAt: r.lastDoneAt })
-      uni.setStorageSync(hKey, hist)
+      DataManager.saveData(this.user.id, 'history', hist)
       this.loadReminders()
       this.swipedId = null
       uni.showToast({ title: this.$t('home.markedDone'), icon: 'none' })
