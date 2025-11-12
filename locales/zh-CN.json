@@ -1,7 +1,8 @@
 {
   "common": {
     "back": "返回",
-    "and": "和"
+    "and": "和",
+    "notSet": "未设置"
   },
   "choose": {
     "createAccount": "创建账户",
@@ -31,6 +32,7 @@
     "registerSuccess": "注册成功"
   },
   "pet": {
+    "name": "宠物",
     "add": {
       "title": "添加宠物档案",
       "uploadTitle": "上传头像",
@@ -55,5 +57,113 @@
       "toastWeightInvalid": "请输入有效的正数",
       "toastSaved": "已保存"
     }
+  },
+  "home": {
+    "viewHealth": "健康档案",
+    "viewProfile": "查看档案",
+    "noPetsTip": "暂无宠物，先添加一个吧～",
+    "toastAddPetFirst": "请先添加宠物",
+    "added": "已添加",
+    "presetsAdded": "预设已添加",
+    "markedDone": "已完成",
+    "ageLessThanOne": "未满1岁",
+    "ageSuffixYears": "岁",
+    "presets": {
+      "internalDeworm": "体内驱虫",
+      "externalDeworm": "体外驱虫",
+      "vaccination": "疫苗接种",
+      "bathCare": "洗澡护理",
+      "nailTrimming": "修剪指甲"
+    }
+  },
+  "profile": {
+    "summary": {
+      "petsLabel": "宠物数量",
+      "joinedLabel": "加入时间"
+    },
+    "modify": {
+      "title": "修改个人信息",
+      "nickname": "昵称",
+      "bio": "简介",
+      "bioPlaceholder": "介绍一下你和你的宠物吧……",
+      "save": "保存修改",
+      "toastSaved": "已保存"
+    },
+    "security": {
+      "title": "账户安全",
+      "changePassword": "修改密码",
+      "switchUser": "切换用户",
+      "googleAccount": "Google 账户",
+      "unbind": "解绑",
+      "appleAccount": "Apple 账户",
+      "bind": "绑定"
+    },
+    "system": {
+      "title": "系统设置",
+      "language": "语言",
+      "clearCache": "清除缓存",
+      "theme": "主题 / 外观",
+      "systemDefault": "系统默认",
+      "notifications": "通知偏好",
+      "privacy": "隐私设置"
+    },
+    "logout": "退出登录"
+  },
+  "tab": {
+    "home": "首页",
+    "pet": "宠物报告",
+    "history": "历史记录",
+    "profile": "我的"
+  },
+  "nav": {
+    "home": "首页",
+    "health": "健康档案",
+    "pet": "宠物报告",
+    "history": "历史记录",
+    "profile": "我的",
+    "login": "手机号登录",
+    "addPet": "添加宠物"
+  },
+  "health": {
+    "appTitle": "健康档案",
+    "titleWithName": "{name} 的档案",
+    "unnamedPet": "未命名宠物",
+    "trend": "健康趋势",
+    "lastTwoWeeks": "最近两周",
+    "visitFreq": "就诊频次",
+    "filter": {
+      "all": "全部",
+      "vaccine": "疫苗",
+      "visit": "就诊",
+      "exam": "体检",
+      "filter": "筛选"
+    },
+    "group": {
+      "done": "完成",
+      "viewAll": "查看全部"
+    },
+    "modal": {
+      "filterSearch": "筛选与搜索",
+      "searchPlaceholder": "搜索关键词",
+      "pickDate": "选择日期",
+      "prevPage": "上一页",
+      "nextPage": "下一页",
+      "close": "关闭"
+    },
+    "addModal": {
+      "title": "新增记录",
+      "type": { "vaccine": "疫苗", "visit": "就诊", "exam": "体检" },
+      "pickDate": "选择日期",
+      "summaryPlaceholder": "填写摘要（不含敏感信息）",
+      "cancel": "取消",
+      "save": "保存"
+    },
+    "toast": {
+      "trendPoint": "趋势点",
+      "freqBar": "频次柱",
+      "added": "已新增",
+      "enterSummary": "请填写摘要"
+    },
+    "notSet": "未设置"
   }
 }

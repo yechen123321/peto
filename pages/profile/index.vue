@@ -1,46 +1,209 @@
 <template>
-  <view class="container">
-    <view class="hero">
-      <view class="avatar">{{ user?.phone ? user.phone.slice(-4) : '未' }}</view>
-      <view class="header">我的</view>
+  <view class="flex-1 p-4 space-y-6">
+    <!-- 顶部栏移除，根据需求不显示 Settings 标题 -->
+
+    <!-- Profile Summary Card -->
+    <view class="flex items-center gap-4 bg-neutral-card dark:bg-zinc-800 p-6 rounded-xl shadow-sm">
+      <view class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-16 w-16 shrink-0"
+        :style="{ backgroundImage: 'url(https://lh3.googleusercontent.com/aida-public/AB6AXuDCSxiXkUIJiaqABDTK18DLKHIpyXXtyLgCUaVxEKvNa7NXOLSZAxpGnZFOAezI7xxj0ZkGV6WXFjMk5KIbnMlFuZTVIXy32Y6naPwzHUHh8cWsP43zRh_25ZsO77kNsfCAJM3IgMEyQKoGwOIct3FHPdKaz41NDhyNtnROH2pA7QvcX6pjHc7NK8P_BkVtrpurr3zRQeOKeGdzQ3p7lHoU6yFxyqS_xwnQltNz1OqRhTAn96fU_h0Gi0-rkx3lFK4v4ltDBTRt6F_p)' }">
+      </view>
+      <view class="flex flex-col justify-center">
+        <text class="text-neutral-text-primary dark:text-white text-lg font-bold leading-normal line-clamp-1">{{
+          user?.phone || 'User' }}</text>
+        <text class="text-neutral-text-secondary dark:text-gray-400 text-sm leading-normal line-clamp-1">{{
+          $t('profile.summary.petsLabel') }}: {{ petCount }}</text>
+        <text class="text-neutral-text-secondary dark:text-gray-400 text-xs leading-normal mt-1">{{
+          $t('profile.summary.joinedLabel') }}: {{ formatCompactDate(user?.joinedAt || '20241108', user?.lang || user?.locale) }}</text>
+      </view>
     </view>
-    <view class="info">
-      <view class="info-card">
-        <view class="label">手机号</view>
-        <view class="value">{{ user?.phone || '未登录' }}</view>
+
+    <!-- Modify Personal Information Card -->
+    <view class="bg-neutral-card dark:bg-zinc-800 p-4 rounded-xl shadow-sm space-y-4">
+      <text
+        class="text-neutral-text-primary dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] px-2 pt-2">{{
+          $t('profile.modify.title') }}</text>
+      <view class="px-2">
+        <label class="flex flex-col min-w-40 flex-1">
+          <text class="text-neutral-text-primary dark:text-white text-base font-medium leading-normal pb-2">{{
+            $t('profile.modify.nickname') }}</text>
+          <input
+            class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-neutral-text-primary dark:text-white dark:bg-zinc-700 focus:outline-0 focus:ring-2 focus:ring-warm-orange border border-gray-300 dark:border-zinc-600 bg-neutral-bg focus:border-warm-orange h-14 placeholder:text-neutral-text-secondary p-[15px] text-base font-normal leading-normal"
+            :value="user?.phone || 'Username123'" />
+        </label>
       </view>
-      <view class="info-card">
-        <view class="label">宠物数量</view>
-        <view class="value">{{ petCount }}</view>
+      <view class="px-2">
+        <label class="flex flex-col min-w-40 flex-1">
+          <text class="text-neutral-text-primary dark:text-white text-base font-medium leading-normal pb-2">{{
+            $t('profile.modify.bio') }}</text>
+          <textarea
+            class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-neutral-text-primary dark:text-white dark:bg-zinc-700 focus:outline-0 focus:ring-2 focus:ring-warm-orange border border-gray-300 dark:border-zinc-600 bg-neutral-bg focus:border-warm-orange min-h-28 placeholder:text-neutral-text-secondary p-[15px] text-base font-normal leading-normal"
+            :placeholder="$t('profile.modify.bioPlaceholder')"></textarea>
+        </label>
       </view>
-      <view class="info-card">
-        <view class="label">语言设置</view>
-        <view class="value" style="display:flex; gap: 12rpx;">
-          <button class="btn" @click="changeLocale('zh-CN')">简体中文</button>
-          <button class="btn" @click="changeLocale('en')">English</button>
+      <view class="px-2 pt-2">
+        <button
+          class="flex items-center justify-center w-full bg-warm-orange text-white h-12 px-6 rounded-lg font-bold text-base leading-normal shadow-sm hover:opacity-90 transition-opacity"
+          @click="uni.showToast({ title: $t('profile.modify.toastSaved'), icon: 'none' })">{{ $t('profile.modify.save')
+          }}</button>
+      </view>
+    </view>
+
+    <!-- Account Security Card -->
+    <view class="bg-neutral-card dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden">
+      <text
+        class="text-neutral-text-primary dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] p-4 pb-2">{{
+          $t('profile.security.title') }}</text>
+      <view class="divide-y divide-gray-200 dark:divide-zinc-700">
+        <view
+          class="flex items-center gap-4 px-4 min-h-[56px] py-2 justify-between hover:bg-gray-50 dark:hover:bg-zinc-700">
+          <view class="flex items-center gap-4">
+            <text class="material-symbols-outlined text-serene-blue">lock</text>
+            <text class="text-neutral-text-primary dark:text-white text-base font-medium leading-normal">{{
+              $t('profile.security.changePassword') }}</text>
+          </view>
+          <text class="material-symbols-outlined text-neutral-text-secondary dark:text-gray-400">chevron_right</text>
+        </view>
+        <view
+          class="flex items-center gap-4 px-4 min-h-[56px] py-2 justify-between hover:bg-gray-50 dark:hover:bg-zinc-700">
+          <view class="flex items-center gap-4">
+            <text class="material-symbols-outlined text-serene-blue">switch_account</text>
+            <text class="text-neutral-text-primary dark:text-white text-base font-medium leading-normal">{{
+              $t('profile.security.switchUser') }}</text>
+          </view>
+          <text class="material-symbols-outlined text-neutral-text-secondary dark:text-gray-400">chevron_right</text>
         </view>
       </view>
     </view>
-    <button class="btn danger" @click="logout">退出登录</button>
+
+    <!-- System Settings Card -->
+    <view class="bg-neutral-card dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden">
+      <text
+        class="text-neutral-text-primary dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] p-4 pb-2">{{
+          $t('profile.system.title') }}</text>
+      <view class="divide-y divide-gray-200 dark:divide-zinc-700">
+        <view
+          class="flex items-center gap-4 px-4 min-h-[56px] py-2 justify-between hover:bg-gray-50 dark:hover:bg-zinc-700">
+          <view class="flex items-center gap-4">
+            <text class="material-symbols-outlined text-serene-blue">language</text>
+            <text class="text-neutral-text-primary dark:text-white text-base font-medium leading-normal">{{
+              $t('profile.system.language') }}</text>
+          </view>
+          <picker mode="selector" :range="localeLabels" :value="localeIndex" @change="onLocaleChange">
+            <view class="flex items-center gap-2">
+              <text class="text-neutral-text-secondary dark:text-gray-400 text-base">{{ displayLocaleLabel }}</text>
+              <text
+                class="material-symbols-outlined text-neutral-text-secondary dark:text-gray-400">chevron_right</text>
+            </view>
+          </picker>
+        </view>
+        <view
+          class="flex items-center gap-4 px-4 min-h-[56px] py-2 justify-between hover:bg-gray-50 dark:hover:bg-zinc-700">
+          <view class="flex items-center gap-4">
+            <text class="material-symbols-outlined text-serene-blue">delete</text>
+            <text class="text-neutral-text-primary dark:text-white text-base font-medium leading-normal">{{
+              $t('profile.system.clearCache') }}</text>
+          </view>
+          <view class="flex items-center gap-2">
+            <text class="text-neutral-text-secondary dark:text-gray-400 text-base">24.5 MB</text>
+            <text class="material-symbols-outlined text-neutral-text-secondary dark:text-gray-400">chevron_right</text>
+          </view>
+        </view>
+        <view
+          class="flex items-center gap-4 px-4 min-h-[56px] py-2 justify-between hover:bg-gray-50 dark:hover:bg-zinc-700">
+          <view class="flex items-center gap-4">
+            <text class="material-symbols-outlined text-serene-blue">contrast</text>
+            <text class="text-neutral-text-primary dark:text-white text-base font-medium leading-normal">{{
+              $t('profile.system.theme') }}</text>
+          </view>
+          <view class="flex items-center gap-2">
+            <text class="text-neutral-text-secondary dark:text-gray-400 text-base">{{ $t('profile.system.systemDefault')
+            }}</text>
+            <text class="material-symbols-outlined text-neutral-text-secondary dark:text-gray-400">chevron_right</text>
+          </view>
+        </view>
+        <view
+          class="flex items-center gap-4 px-4 min-h-[56px] py-2 justify-between hover:bg-gray-50 dark:hover:bg-zinc-700">
+          <view class="flex items-center gap-4">
+            <text class="material-symbols-outlined text-serene-blue">notifications</text>
+            <text class="text-neutral-text-primary dark:text-white text-base font-medium leading-normal">{{
+              $t('profile.system.notifications') }}</text>
+          </view>
+          <text class="material-symbols-outlined text-neutral-text-secondary dark:text-gray-400">chevron_right</text>
+        </view>
+        <view
+          class="flex items-center gap-4 px-4 min-h-[56px] py-2 justify-between hover:bg-gray-50 dark:hover:bg-zinc-700">
+          <view class="flex items-center gap-4">
+            <text class="material-symbols-outlined text-serene-blue">privacy_tip</text>
+            <text class="text-neutral-text-primary dark:text-white text-base font-medium leading-normal">{{
+              $t('profile.system.privacy') }}</text>
+          </view>
+          <text class="material-symbols-outlined text-neutral-text-secondary dark:text-gray-400">chevron_right</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 退出登录以统一的行样式展示 -->
+    <view class="bg-neutral-card dark:bg-zinc-800 rounded-xl shadow-sm overflow-hidden">
+      <view class="divide-y divide-gray-200 dark:divide-zinc-700">
+        <view
+          class="flex items-center gap-4 px-4 min-h-[56px] py-2 justify-between hover:bg-gray-50 dark:hover:bg-zinc-700"
+          @click="logout">
+          <view class="flex items-center gap-4">
+            <text class="material-symbols-outlined text-error-red">logout</text>
+            <text class="text-neutral-text-primary dark:text-white text-base font-medium leading-normal">{{
+              $t('profile.logout') }}</text>
+          </view>
+          <text class="material-symbols-outlined text-neutral-text-secondary dark:text-gray-400">chevron_right</text>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
 <script>
+import { applyTabBarLocale } from '../../i18n/index.js'
 export default {
-  data(){ return { user: null, petCount: 0 } },
-  onShow(){
+  data() { return { user: null, petCount: 0, currentLocale: 'en', locales: ['zh-CN', 'en'], localeLabels: ['简体中文', 'English'] } },
+  onShow() {
     const user = uni.getStorageSync('user')
     if (!user) { uni.redirectTo({ url: '/pages/login/index' }); return }
     this.user = user
     const pets = uni.getStorageSync('pets_' + user.id) || []
     this.petCount = pets.length
+    const saved = uni.getStorageSync('locale')
+    this.currentLocale = saved || (this.$i18n ? this.$i18n.locale : 'en')
+    // 设置导航标题与刷新 tabBar 文案
+    try { uni.setNavigationBarTitle({ title: this.$t('nav.profile') }) } catch (e) { }
+    try { const locale = this.currentLocale; applyTabBarLocale(locale) } catch (e) { }
   },
-  methods:{
-    logout(){
+  methods: {
+    logout() {
       uni.removeStorageSync('user')
       uni.redirectTo({ url: '/pages/login/index' })
     },
-    changeLocale(locale){
+    // 将紧凑日期字符串（YYYYMMDD，如“20241108”）按数据语言格式化展示
+    // 输入非8位数字时，直接原样返回（即展示后端提供的文本）
+    formatCompactDate(value, lang) {
+      if (!value) return '20241108'
+      const str = String(value).trim()
+      if (/^\d{8}$/.test(str)) {
+        const y = parseInt(str.slice(0, 4), 10)
+        const m = parseInt(str.slice(4, 6), 10)
+        const d = parseInt(str.slice(6, 8), 10)
+        const effLang = (this.$i18n && this.$i18n.locale) ? this.$i18n.locale : lang
+        const isZh = String(effLang || '').toLowerCase().includes('zh')
+        if (isZh) {
+          const mm = String(m).padStart(2, '0')
+          const dd = String(d).padStart(2, '0')
+          return `${y}年${mm}月${dd}日`
+        }
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        return `${months[m - 1]} ${d}, ${y}`
+      }
+      return str
+    },
+    // 日期展示依赖后端/数据库提供的字符串，不在前端做本地化转换
+    changeLocale(locale) {
       const current = uni.getStorageSync('locale')
       if (current === locale) {
         uni.showToast({ title: '已是该语言', icon: 'none' })
@@ -50,7 +213,10 @@ export default {
       // 尝试立即切换（Vue2 可用），否则重启/刷新以全局生效
       if (this.$i18n) {
         this.$i18n.locale = locale
+        // 同步更新 tabBar 文案
+        applyTabBarLocale(locale)
         uni.showToast({ title: '语言已切换', icon: 'none' })
+        this.currentLocale = locale
         return
       }
       // H5刷新；APP重启；小程序/其他则重启页面
@@ -66,23 +232,38 @@ export default {
           plus.runtime.restart()
           return
         }
-      } catch(e) {}
+      } catch (e) { }
       // #endif
       uni.reLaunch({ url: '/pages/login/index' })
+    },
+    onLocaleChange(e) {
+      const idx = e?.detail?.value
+      const target = this.locales[idx] || 'en'
+      this.changeLocale(target)
+    }
+  },
+  computed: {
+    localeIndex() {
+      const i = this.locales.indexOf(this.currentLocale)
+      return i >= 0 ? i : 1
+    },
+    displayLocaleLabel() {
+      const i = this.locales.indexOf(this.currentLocale)
+      return this.localeLabels[i] || 'English'
     }
   }
 }
 </script>
 
 <style>
-.container { padding: 24rpx; }
-.hero { display:flex; align-items:center; gap: 16rpx; padding: 24rpx; border-radius: 16rpx; background: linear-gradient(135deg, #fef6f6 0%, #ffffff 100%); box-shadow: 0 8rpx 16rpx rgba(0,0,0,0.06); margin-bottom: 20rpx; }
-.avatar { width: 72rpx; height: 72rpx; border-radius: 36rpx; background:#ffddde; color:#c0392b; display:flex; align-items:center; justify-content:center; font-weight: 700; }
-.header { font-size: 36rpx; font-weight: 700; }
-.info { display:grid; grid-template-columns: 1fr; gap: 12rpx; }
-.info-card { background:#fff; border: 1rpx solid #eee; border-radius: 12rpx; padding: 16rpx; box-shadow: 0 6rpx 12rpx rgba(0,0,0,0.05); }
-.label { font-size: 24rpx; color:#666; }
-.value { font-size: 28rpx; font-weight: 600; color:#1c1c1e; }
-.btn { padding: 14rpx 22rpx; border-radius: 10rpx; background:#eee; }
-.btn.danger { background:#ff3b30; color:#fff; }
+.btn {
+  padding: 14rpx 22rpx;
+  border-radius: 10rpx;
+  background: #eee;
+}
+
+.btn.danger {
+  background: #ff3b30;
+  color: #fff;
+}
 </style>

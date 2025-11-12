@@ -3,7 +3,8 @@
     <!-- 顶部栏 -->
     <view
       class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10 border-b border-gray-200/50 dark:border-white/10">
-      <text class="text-gray-900 dark:text-gray-50 text-xl font-bold leading-tight tracking-[-0.015em] flex-1">Peto</text>
+      <text
+        class="text-gray-900 dark:text-gray-50 text-xl font-bold leading-tight tracking-[-0.015em] flex-1">Peto</text>
       <view class="flex items-center justify-end">
         <button
           class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 bg-primary/20 text-primary"
@@ -15,26 +16,29 @@
 
     <!-- 主内容：宠物卡片走马灯 -->
     <view class="flex-1 flex flex-col justify-center overflow-hidden">
-      <view class="flex overflow-x-auto snap-x snap-mandatory [-ms-scrollbar-style:none] [scrollbar-width:none] [&:scrollbar]:hidden py-8">
+      <view
+        class="flex overflow-x-auto snap-x snap-mandatory [-ms-scrollbar-style:none] [scrollbar-width:none] [&:scrollbar]:hidden py-8">
         <view class="flex items-center gap-4 px-4 sm:px-8">
           <view v-for="p in pets" :key="p.id"
             class="flex flex-col gap-4 rounded-xl bg-white dark:bg-slate-900 shadow-lg min-w-[75vw] sm:min-w-[300px] max-w-[320px] snap-center relative">
-            <view class="w-full bg-center bg-no-repeat aspect-[4/3] bg-cover rounded-t-xl" :style="photoStyle(p)"></view>
+            <view class="w-full bg-center bg-no-repeat aspect-[4/3] bg-cover rounded-t-xl" :style="photoStyle(p)">
+            </view>
             <view class="flex flex-col flex-1 justify-between p-4 pt-2 gap-4">
               <view>
                 <text class="text-gray-900 dark:text-gray-50 text-2xl font-bold leading-normal">{{ p.name }}</text>
                 <view class="flex flex-col gap-2 mt-3 text-sm text-gray-600 dark:text-gray-400">
                   <view class="flex items-center gap-2">
                     <text class="material-symbols-outlined !text-base text-gray-500 dark:text-gray-400">pets</text>
-                    <text>{{ p.breed || '未设置' }}</text>
+                    <text>{{ p.breed || $t('common.notSet') }}</text>
                   </view>
                   <view class="flex items-center gap-2">
                     <text class="material-symbols-outlined !text-base text-gray-500 dark:text-gray-400">cake</text>
                     <text>{{ ageText(p.birthday) }}</text>
                   </view>
                   <view class="flex items-center gap-2">
-                    <text class="material-symbols-outlined !text-base text-gray-500 dark:text-gray-400">{{ p.gender === 'female' ? 'female' : 'male' }}</text>
-                    <text>{{ p.gender === 'female' ? '母' : '公' }}</text>
+                    <text class="material-symbols-outlined !text-base text-gray-500 dark:text-gray-400">{{ p.gender ===
+                      'female' ? 'female' : 'male' }}</text>
+                    <text>{{ p.gender === 'female' ? $t('pet.add.genderFemale') : $t('pet.add.genderMale') }}</text>
                   </view>
                 </view>
               </view>
@@ -43,16 +47,16 @@
                   class="flex-1 flex min-w-0 max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-4 bg-serene-blue/20 dark:bg-serene-blue/30 text-serene-blue text-sm font-bold leading-normal gap-2"
                   @click="toHealth(p)">
                   <text class="material-symbols-outlined !text-base">health_and_safety</text>
-                  <text class="truncate">健康档案</text>
+                  <text class="truncate">{{ $t('home.viewHealth') }}</text>
                 </button>
                 <button
                   class="flex-1 flex min-w-0 max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-4 bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 text-sm font-bold leading-normal">
-                  <text class="truncate">查看档案</text>
+                  <text class="truncate">{{ $t('home.viewProfile') }}</text>
                 </button>
               </view>
             </view>
           </view>
-          <view v-if="pets.length === 0" class="px-4 text-gray-600 dark:text-gray-400">暂无宠物，先添加一个吧～</view>
+          <view v-if="pets.length === 0" class="px-4 text-gray-600 dark:text-gray-400">{{ $t('home.noPetsTip') }}</view>
         </view>
       </view>
 
@@ -69,12 +73,13 @@
 </template>
 
 <script>
+import { applyTabBarLocale } from '../../i18n/index.js'
 const PRESETS = [
-  { title: '体内驱虫', cycleDays: 30 },
-  { title: '体外驱虫', cycleDays: 30 },
-  { title: '疫苗接种', cycleDays: 365 },
-  { title: '洗澡护理', cycleDays: 14 },
-  { title: '修剪指甲', cycleDays: 21 }
+  { title: 'home.presets.internalDeworm', cycleDays: 30 },
+  { title: 'home.presets.externalDeworm', cycleDays: 30 },
+  { title: 'home.presets.vaccination', cycleDays: 365 },
+  { title: 'home.presets.bathCare', cycleDays: 14 },
+  { title: 'home.presets.nailTrimming', cycleDays: 21 }
 ]
 
 export default {
@@ -94,6 +99,9 @@ export default {
       return
     }
     this.user = user
+    // 设置导航标题与刷新 tabBar 文案
+    try { uni.setNavigationBarTitle({ title: this.$t('nav.home') }) } catch (e) {}
+    try { const locale = uni.getStorageSync('locale') || (this.$i18n ? this.$i18n.locale : 'en'); applyTabBarLocale(locale) } catch (e) {}
     this.loadPets()
     this.loadReminders()
   },
@@ -139,7 +147,7 @@ export default {
       return `${y}-${m}-${day}`
     },
     ageText(birthday) {
-      if (!birthday) return '未设置'
+      if (!birthday) return this.$t('common.notSet')
       const d = new Date(birthday)
       if (isNaN(d.getTime())) return birthday
       const now = new Date()
@@ -147,7 +155,7 @@ export default {
       const m = now.getMonth() - d.getMonth()
       const da = now.getDate() - d.getDate()
       if (m < 0 || (m === 0 && da < 0)) years--
-      return years <= 0 ? '未满1岁' : `${years}岁`
+      return years <= 0 ? this.$t('home.ageLessThanOne') : `${years}${this.$t('home.ageSuffixYears')}`
     },
     photoStyle(p) {
       const url = p.photo || p.avatar || p.photoUrl || ''
@@ -155,7 +163,7 @@ export default {
     },
     openAddReminder() {
       if (this.pets.length === 0) {
-        uni.showToast({ title: '请先添加宠物', icon: 'none' })
+        uni.showToast({ title: this.$t('home.toastAddPetFirst'), icon: 'none' })
         return
       }
       this.reminderForm = { title: '', cycleDays: 0, note: '', petId: this.pets[0].id }
@@ -181,7 +189,7 @@ export default {
       uni.setStorageSync(key, list)
       this.loadReminders()
       this.closeAddReminder()
-      uni.showToast({ title: '已添加', icon: 'none' })
+      uni.showToast({ title: this.$t('home.added'), icon: 'none' })
     },
     addPresetBatch() {
       if (this.pets.length === 0) { return }
@@ -190,14 +198,15 @@ export default {
       const list = uni.getStorageSync(key) || []
       const now = Date.now()
       PRESETS.forEach(p => {
-        const exists = list.find(x => x.title === p.title && x.petId === petId)
+        const displayTitle = this.$t(p.title)
+        const exists = list.find(x => x.title === displayTitle && x.petId === petId)
         if (!exists) {
-          list.push({ id: now + Math.random(), title: p.title, cycleDays: p.cycleDays, note: '', petId, lastDoneAt: null, nextDueAt: now + p.cycleDays * 24 * 3600 * 1000, preset: true })
+          list.push({ id: now + Math.random(), title: displayTitle, cycleDays: p.cycleDays, note: '', petId, lastDoneAt: null, nextDueAt: now + p.cycleDays * 24 * 3600 * 1000, preset: true })
         }
       })
       uni.setStorageSync(key, list)
       this.loadReminders()
-      uni.showToast({ title: '预设已添加', icon: 'none' })
+      uni.showToast({ title: this.$t('home.presetsAdded'), icon: 'none' })
     },
     markDone(r) {
       r.lastDoneAt = Date.now()
@@ -212,7 +221,7 @@ export default {
       uni.setStorageSync(hKey, hist)
       this.loadReminders()
       this.swipedId = null
-      uni.showToast({ title: '已完成', icon: 'none' })
+      uni.showToast({ title: this.$t('home.markedDone'), icon: 'none' })
     }
     , dayBounds() {
       const d = new Date()

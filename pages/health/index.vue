@@ -9,7 +9,7 @@
       </button>
       <text
         class="text-dark-gray dark:text-background-light text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">{{
-          pet?.name ? (pet.name + ' 的档案') : '健康档案' }}</text>
+          pet?.name ? $t('health.titleWithName', { name: pet.name }) : $t('health.appTitle') }}</text>
       <view class="w-10"></view>
     </view>
 
@@ -17,24 +17,24 @@
     <view class="flex items-center gap-4 bg-light-gray dark:bg-background-dark px-4 py-4 justify-start">
       <view class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12" :style="avatarStyle"></view>
       <text class="text-dark-gray dark:text-background-light text-lg font-semibold leading-normal flex-1 truncate">{{
-        pet?.name || '未命名宠物' }}</text>
+        pet?.name || $t('health.unnamedPet') }}</text>
     </view>
 
     <!-- 统计与图表卡片 -->
     <view class="flex overflow-x-auto gap-4 px-4 py-3 snap-x snap-mandatory">
       <view
         class="flex min-w-[90%] md:min-w-72 flex-1 flex-col gap-2 p-4 bg-white dark:bg-black/20 rounded-xl snap-center shrink-0">
-        <text class="text-dark-gray dark:text-gray-300 text-base font-medium leading-normal">健康趋势</text>
+        <text class="text-dark-gray dark:text-gray-300 text-base font-medium leading-normal">{{ $t('health.trend') }}</text>
         <text
-          class="text-dark-gray dark:text-white tracking-light text-[32px] font-bold leading-tight truncate">最近两周</text>
+          class="text-dark-gray dark:text-white tracking-light text-[32px] font-bold leading-tight truncate">{{ $t('health.lastTwoWeeks') }}</text>
         <view class="h-[180px] w-full rounded-md border border-gray-200/80 dark:border-gray-700" id="healthLine"
           @click="onChartClick('line')"></view>
       </view>
       <view
         class="flex min-w-[90%] md:min-w-72 flex-1 flex-col gap-2 p-4 bg-white dark:bg-black/20 rounded-xl snap-center shrink-0">
-        <text class="text-dark-gray dark:text-gray-300 text-base font-medium leading-normal">就诊频次</text>
+        <text class="text-dark-gray dark:text-gray-300 text-base font-medium leading-normal">{{ $t('health.visitFreq') }}</text>
         <text
-          class="text-dark-gray dark:text-white tracking-light text-[32px] font-bold leading-tight truncate">最近两周</text>
+          class="text-dark-gray dark:text-white tracking-light text-[32px] font-bold leading-tight truncate">{{ $t('health.lastTwoWeeks') }}</text>
         <view class="h-[180px] w-full rounded-md border border-gray-200/80 dark:border-gray-700" id="visitBar"
           @click="onChartClick('bar')"></view>
       </view>
@@ -46,27 +46,27 @@
         <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4"
           :class="filterType === 'all' ? 'bg-warm-orange text-white' : 'bg-white dark:bg-black/20'"
           @click="setFilterType('all')">
-          <text class="text-sm font-semibold leading-normal">全部</text>
+          <text class="text-sm font-semibold leading-normal">{{ $t('health.filter.all') }}</text>
         </button>
         <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4"
           :class="filterType === 'vaccine' ? 'bg-warm-orange text-white' : 'bg-white dark:bg-black/20'"
           @click="setFilterType('vaccine')">
-          <text class="text-dark-gray dark:text-gray-300 text-sm font-medium leading-normal">疫苗</text>
+          <text class="text-dark-gray dark:text-gray-300 text-sm font-medium leading-normal">{{ $t('health.filter.vaccine') }}</text>
         </button>
         <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4"
           :class="filterType === 'visit' ? 'bg-warm-orange text-white' : 'bg-white dark:bg-black/20'"
           @click="setFilterType('visit')">
-          <text class="text-dark-gray dark:text-gray-300 text-sm font-medium leading-normal">就诊</text>
+          <text class="text-dark-gray dark:text-gray-300 text-sm font-medium leading-normal">{{ $t('health.filter.visit') }}</text>
         </button>
         <button class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full px-4"
           :class="filterType === 'exam' ? 'bg-warm-orange text-white' : 'bg-white dark:bg-black/20'"
           @click="setFilterType('exam')">
-          <text class="text-dark-gray dark:text-gray-300 text-sm font-medium leading-normal">体检</text>
+          <text class="text-dark-gray dark:text-gray-300 text-sm font-medium leading-normal">{{ $t('health.filter.exam') }}</text>
         </button>
         <button
           class="flex h-9 shrink-0 items-center justify-center gap-x-2 rounded-full bg-white dark:bg-black/20 pl-4 pr-3"
           @click="openFullModal">
-          <text class="text-dark-gray dark:text-gray-300 text-sm font-medium leading-normal">筛选</text>
+          <text class="text-dark-gray dark:text-gray-300 text-sm font-medium leading-normal">{{ $t('health.filter.filter') }}</text>
           <text class="material-symbols-outlined text-xl">calendar_month</text>
         </button>
       </view>
@@ -82,7 +82,7 @@
           <view class="relative flex flex-col items-center">
             <view class="flex items-center justify-center rounded-full h-10 w-10 z-[1]" :class="dotBgClass(group.type)">
               <text class="material-symbols-outlined text-xl" :class="dotIconClass(group.type)">{{ typeIcon(group.type)
-                }}</text>
+              }}</text>
             </view>
             <view class="w-0.5 flex-1 bg-gray-300 dark:bg-gray-700"></view>
           </view>
@@ -91,7 +91,7 @@
               <text class="text-dark-gray dark:text-white font-semibold">{{ maskSummary(item.summary) }}</text>
               <view class="flex items-center gap-1.5 text-status-green">
                 <view class="h-2 w-2 rounded-full bg-status-green"></view>
-                <text class="text-xs font-medium">完成</text>
+                <text class="text-xs font-medium">{{ $t('health.group.done') }}</text>
               </view>
             </view>
             <text class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{{ formatDate(item.date) }}</text>
@@ -101,7 +101,7 @@
       <view class="flex items-center justify-center pt-2">
         <button class="flex items-center justify-center h-10 px-4 rounded-xl bg-warm-orange text-white"
           @click="openFullModal">
-          <text class="text-sm font-semibold leading-normal">查看全部</text>
+          <text class="text-sm font-semibold leading-normal">{{ $t('health.group.viewAll') }}</text>
         </button>
       </view>
     </view>
@@ -111,26 +111,26 @@
       <view class="modal-card">
         <view class="modal-header">
           <text class="material-symbols-outlined header-icon">filter_alt</text>
-          <text class="modal-title">筛选与搜索</text>
+          <text class="modal-title">{{ $t('health.modal.filterSearch') }}</text>
           <button class="icon-btn" @click="closeFullModal"><text class="material-symbols-outlined">close</text></button>
         </view>
         <view class="filter-bar">
-          <input class="input" placeholder="搜索关键词" v-model="search" />
+          <input class="input" :placeholder="$t('health.modal.searchPlaceholder')" v-model="search" />
           <view class="select-wrap">
             <button class="select-btn" @click="toggleTypeDropdown">
               <text>{{ typeLabel(filterType) }}</text>
               <text class="material-symbols-outlined">expand_more</text>
             </button>
             <view v-if="showTypeDropdown" class="dropdown">
-              <view class="dropdown-item" @click="selectFilterType('all')">全部</view>
-              <view class="dropdown-item" @click="selectFilterType('vaccine')">疫苗</view>
-              <view class="dropdown-item" @click="selectFilterType('visit')">就诊</view>
-              <view class="dropdown-item" @click="selectFilterType('exam')">体检</view>
+              <view class="dropdown-item" @click="selectFilterType('all')">{{ $t('health.filter.all') }}</view>
+              <view class="dropdown-item" @click="selectFilterType('vaccine')">{{ $t('health.filter.vaccine') }}</view>
+              <view class="dropdown-item" @click="selectFilterType('visit')">{{ $t('health.filter.visit') }}</view>
+              <view class="dropdown-item" @click="selectFilterType('exam')">{{ $t('health.filter.exam') }}</view>
             </view>
           </view>
           <view class="picker-wrap">
             <picker mode="date" :value="filterDate" @change="onFilterDateChange">
-              <view class="date-input">{{ filterDate || '选择日期' }}</view>
+              <view class="date-input">{{ filterDate || $t('health.modal.pickDate') }}</view>
             </picker>
           </view>
         </view>
@@ -146,13 +146,13 @@
             </view>
           </view>
           <view class="pagination">
-            <button class="btn" @click="prevPage" :disabled="page <= 1">上一页</button>
+            <button class="btn" @click="prevPage" :disabled="page <= 1">{{ $t('health.modal.prevPage') }}</button>
             <text class="page-info">{{ page }} / {{ totalPages }}</text>
-            <button class="btn" @click="nextPage" :disabled="page >= totalPages">下一页</button>
+            <button class="btn" @click="nextPage" :disabled="page >= totalPages">{{ $t('health.modal.nextPage') }}</button>
           </view>
         </scroll-view>
         <view class="modal-actions">
-          <button class="btn" @click="closeFullModal">关闭</button>
+          <button class="btn" @click="closeFullModal">{{ $t('health.modal.close') }}</button>
         </view>
       </view>
     </view>
@@ -162,7 +162,7 @@
       <view class="modal-card">
         <view class="modal-header">
           <text class="material-symbols-outlined header-icon">add_circle</text>
-          <text class="modal-title">新增记录</text>
+          <text class="modal-title">{{ $t('health.addModal.title') }}</text>
           <button class="icon-btn" @click="closeAddModal"><text class="material-symbols-outlined">close</text></button>
         </view>
         <view class="add-filter-bar">
@@ -172,23 +172,23 @@
               <text class="material-symbols-outlined">expand_more</text>
             </button>
             <view v-if="showAddTypeDropdown" class="dropdown">
-              <view class="dropdown-item" @click="selectAddType('vaccine')">疫苗</view>
-              <view class="dropdown-item" @click="selectAddType('visit')">就诊</view>
-              <view class="dropdown-item" @click="selectAddType('exam')">体检</view>
+              <view class="dropdown-item" @click="selectAddType('vaccine')">{{ $t('health.addModal.type.vaccine') }}</view>
+              <view class="dropdown-item" @click="selectAddType('visit')">{{ $t('health.addModal.type.visit') }}</view>
+              <view class="dropdown-item" @click="selectAddType('exam')">{{ $t('health.addModal.type.exam') }}</view>
             </view>
           </view>
           <view class="picker-wrap">
             <picker mode="date" :value="newRecord.date" @change="onDateChange">
-              <view class="date-input">{{ newRecord.date || '选择日期' }}</view>
+              <view class="date-input">{{ newRecord.date || $t('health.addModal.pickDate') }}</view>
             </picker>
           </view>
         </view>
         <view class="form-body">
-          <textarea class="input textarea" placeholder="填写摘要（不含敏感信息）" v-model="newRecord.summary"></textarea>
+          <textarea class="input textarea" :placeholder="$t('health.addModal.summaryPlaceholder')" v-model="newRecord.summary"></textarea>
         </view>
         <view class="modal-actions">
-          <button class="btn" @click="closeAddModal">取消</button>
-          <button class="btn primary" @click="submitAddRecord">保存</button>
+          <button class="btn" @click="closeAddModal">{{ $t('health.addModal.cancel') }}</button>
+          <button class="btn primary" @click="submitAddRecord">{{ $t('health.addModal.save') }}</button>
         </view>
       </view>
     </view>
@@ -239,6 +239,8 @@ export default {
     if (!user) { uni.redirectTo({ url: '/pages/login/index' }); return }
     const pets = uni.getStorageSync('pets_' + user.id) || []
     this.pet = pets.find(p => p.id == this.petId) || pets[0] || null
+    // 更新页面导航标题（即使使用自定义 AppBar，也保证系统标题一致）
+    try { uni.setNavigationBarTitle({ title: this.pet?.name ? this.$t('health.titleWithName', { name: this.pet.name }) : this.$t('nav.health') }) } catch (e) {}
     this.loadRecords(user)
     this.lazyLoadCharts()
   },
@@ -257,7 +259,7 @@ export default {
           .slice(0, 3)
       }))
     },
-    filterTypes() { return ['全部', '疫苗', '就诊', '体检'] },
+    filterTypes() { return [this.$t('health.filter.all'), this.$t('health.filter.vaccine'), this.$t('health.filter.visit'), this.$t('health.filter.exam')] },
     filteredList() {
       const s = (this.search || '').trim().toLowerCase()
       const type = this.filterType
@@ -279,9 +281,9 @@ export default {
   },
   methods: {
     goBack() { uni.navigateBack() },
-    typeLabel(type) { return type === 'vaccine' ? '疫苗' : type === 'visit' ? '就诊' : type === 'exam' ? '体检' : '全部' },
+    typeLabel(type) { return type === 'vaccine' ? this.$t('health.filter.vaccine') : type === 'visit' ? this.$t('health.filter.visit') : type === 'exam' ? this.$t('health.filter.exam') : this.$t('health.filter.all') },
     typeIcon(type) { return type === 'vaccine' ? 'vaccines' : type === 'visit' ? 'monitor_heart' : 'labs' },
-    formatDate(ts) { if (!ts) return '未设置'; const d = new Date(ts); const y = d.getFullYear(), m = (d.getMonth() + 1).toString().padStart(2, '0'), day = d.getDate().toString().padStart(2, '0'); return `${y}-${m}-${day}` },
+    formatDate(ts) { if (!ts) return this.$t('health.notSet') || this.$t('common.notSet'); const d = new Date(ts); const y = d.getFullYear(), m = (d.getMonth() + 1).toString().padStart(2, '0'), day = d.getDate().toString().padStart(2, '0'); return `${y}-${m}-${day}` },
     maskSummary(text) { if (!text) return ''; return String(text).replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') },
     switchTab(key) { this.activeTab = key; this.microInteract() },
     microInteract() { try { if (typeof window !== 'undefined') { const el = document.activeElement; if (el) el.blur() } } catch (e) { } },
@@ -298,13 +300,13 @@ export default {
     onTypeFilterChange(e) { const idx = e.detail.value; this.filterType = idx == 0 ? 'all' : (idx == 1 ? 'vaccine' : idx == 2 ? 'visit' : 'exam'); this.page = 1 },
     prevPage() { if (this.page > 1) this.page-- },
     nextPage() { if (this.page < this.totalPages) this.page++ },
-    onChartClick(kind) { uni.showToast({ title: kind === 'line' ? '趋势点' : '频次柱', icon: 'none', duration: 1200 }) },
+    onChartClick(kind) { uni.showToast({ title: kind === 'line' ? this.$t('health.toast.trendPoint') : this.$t('health.toast.freqBar'), icon: 'none', duration: 1200 }) },
     formatDateOnly(ts) { const d = new Date(ts); const y = d.getFullYear(); const m = (d.getMonth() + 1).toString().padStart(2, '0'); const day = d.getDate().toString().padStart(2, '0'); return `${y}-${m}-${day}` },
     onDateChange(e) { this.newRecord.date = e?.detail?.value || '' },
     onFilterDateChange(e) { this.filterDate = e?.detail?.value || ''; this.page = 1 },
     async submitAddRecord() {
       const { type, date, summary } = this.newRecord
-      if (!summary || !summary.trim()) { uni.showToast({ title: '请填写摘要', icon: 'none' }); return }
+      if (!summary || !summary.trim()) { uni.showToast({ title: this.$t('health.toast.enterSummary'), icon: 'none' }); return }
       const ts = date ? new Date(date).getTime() : Date.now()
       const rec = { id: Date.now() + Math.random(), date: ts, type, summary: summary.trim(), expanded: false }
       this.records = [rec, ...this.records]
@@ -313,7 +315,7 @@ export default {
         const key = `healthRecords_${user.id}_${this.pet?.id || 'unknown'}`
         uni.setStorageSync(key, this.records)
       } catch (e) { }
-      uni.showToast({ title: '已新增', icon: 'success', duration: 1200 })
+      uni.showToast({ title: this.$t('health.toast.added'), icon: 'success', duration: 1200 })
       this.closeAddModal()
     },
     onTimeChange(e) { this.newRecord.time = e?.detail?.value || '' },
@@ -588,7 +590,9 @@ export default {
   border-color: #FFA726;
 }
 
-.modal-actions .btn { min-width: 120px; }
+.modal-actions .btn {
+  min-width: 120px;
+}
 
 .modal {
   position: fixed;
@@ -670,11 +674,27 @@ export default {
 }
 
 /* 让筛选弹框中的类型与日期横向填满并统一视觉 */
-.filter-bar .select-wrap { flex: 1; }
-.filter-bar .picker-wrap { flex: 1.1; }
-.filter-bar .select-btn { width: 100%; justify-content: space-between; }
-.filter-bar .date-input { width: 100%; }
-.filter-bar .select-wrap .dropdown { width: 100%; min-width: 100%; }
+.filter-bar .select-wrap {
+  flex: 1;
+}
+
+.filter-bar .picker-wrap {
+  flex: 1.1;
+}
+
+.filter-bar .select-btn {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.filter-bar .date-input {
+  width: 100%;
+}
+
+.filter-bar .select-wrap .dropdown {
+  width: 100%;
+  min-width: 100%;
+}
 
 .add-filter-bar {
   display: flex;
@@ -771,12 +791,31 @@ export default {
 }
 
 /* 横向填满：左右控件均占满各自空间 */
-.add-filter-bar { display: flex; }
-.select-wrap { flex: 1; }
-.picker-wrap { flex: 2; }
-.select-btn { width: 100%; justify-content: space-between; }
-.date-input { width: 100%; }
-.select-wrap .dropdown { width: 100%; min-width: 100%; }
+.add-filter-bar {
+  display: flex;
+}
+
+.select-wrap {
+  flex: 1;
+}
+
+.picker-wrap {
+  flex: 2;
+}
+
+.select-btn {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.date-input {
+  width: 100%;
+}
+
+.select-wrap .dropdown {
+  width: 100%;
+  min-width: 100%;
+}
 
 .textarea {
   min-height: 96px;
@@ -792,9 +831,11 @@ export default {
   /* 保留外层边框，借鉴登录页仅加外环的做法 */
   box-shadow: 0 0 0 2px rgba(255, 167, 38, 0.35);
 }
+
 .input::placeholder {
   color: #9ca3af;
 }
+
 .input .uni-input-wrapper,
 .date-input .uni-input-wrapper {
   border: none !important;
@@ -802,6 +843,7 @@ export default {
   background: transparent !important;
   padding: 0 !important;
 }
+
 .input .uni-input-input,
 .date-input .uni-input-input,
 .input input,
@@ -811,8 +853,13 @@ export default {
   box-shadow: none !important;
   background: transparent !important;
 }
-.select-btn:focus, .select-btn:active, .select-btn:focus-within,
-.date-input:focus, .date-input:active, .date-input:focus-within {
+
+.select-btn:focus,
+.select-btn:active,
+.select-btn:focus-within,
+.date-input:focus,
+.date-input:active,
+.date-input:focus-within {
   /* 保留外层边框，统一为外环高亮 */
   box-shadow: 0 0 0 2px rgba(255, 167, 38, 0.35);
 }

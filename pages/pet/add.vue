@@ -41,7 +41,7 @@
       <view class="flex flex-col gap-4 mt-6 max-w-lg mx-auto">
         <!-- Pet Name -->
         <text class="text-gray-800 dark:text-gray-200 text-base font-medium leading-normal">{{ $t('pet.add.nameLabel')
-        }}</text>
+          }}</text>
         <view
           class="flex items-center w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 h-14 px-[15px] focus-within:ring-2 focus-within:ring-primary/50">
           <input
@@ -51,7 +51,7 @@
 
         <!-- Breed -->
         <text class="text-gray-800 dark:text-gray-200 text-base font-medium leading-normal">{{ $t('pet.add.breedLabel')
-        }}</text>
+          }}</text>
         <view
           class="flex items-center w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-neutral-800 h-14 px-[15px] focus-within:ring-2 focus-within:ring-primary/50">
           <input
@@ -69,7 +69,7 @@
               <view
                 class="flex w-full rounded-lg text-gray-900 dark:text-gray-50 focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark h-14 p-[15px] text-base items-center justify-between">
                 <text class="text-gray-900 dark:text-gray-50">{{ form.birthday || $t('pet.add.birthdayPlaceholder')
-                }}</text>
+                  }}</text>
                 <text class="material-symbols-outlined text-gray-400 dark:text-gray-500">calendar_today</text>
               </view>
             </picker>

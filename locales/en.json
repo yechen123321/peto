@@ -1,7 +1,8 @@
 {
   "common": {
     "back": "Back",
-    "and": "and"
+    "and": "and",
+    "notSet": "Not set"
   },
   "choose": {
     "createAccount": "Create Account",
@@ -31,6 +32,7 @@
     "registerSuccess": "Registered successfully"
   },
   "pet": {
+    "name": "Pet",
     "add": {
       "title": "Add Pet Profile",
       "uploadTitle": "Upload Avatar",
@@ -55,5 +57,113 @@
       "toastWeightInvalid": "Please enter a valid positive number",
       "toastSaved": "Saved"
     }
+  },
+  "home": {
+    "viewHealth": "Health Records",
+    "viewProfile": "View Profile",
+    "noPetsTip": "No pets yet — add one first",
+    "toastAddPetFirst": "Please add a pet first",
+    "added": "Added",
+    "presetsAdded": "Presets added",
+    "markedDone": "Completed",
+    "ageLessThanOne": "Under 1 year",
+    "ageSuffixYears": " years",
+    "presets": {
+      "internalDeworm": "Internal Deworming",
+      "externalDeworm": "External Deworming",
+      "vaccination": "Vaccination",
+      "bathCare": "Bath Care",
+      "nailTrimming": "Nail Trimming"
+    }
+  },
+  "profile": {
+    "summary": {
+      "petsLabel": "Pets",
+      "joinedLabel": "Joined"
+    },
+    "modify": {
+      "title": "Modify Personal Information",
+      "nickname": "Nickname",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell us about yourself and your pets...",
+      "save": "Save Changes",
+      "toastSaved": "Saved"
+    },
+    "security": {
+      "title": "Account Security",
+      "changePassword": "Change Password",
+      "switchUser": "Switch User",
+      "googleAccount": "Google Account",
+      "unbind": "Unbind",
+      "appleAccount": "Apple Account",
+      "bind": "Bind"
+    },
+    "system": {
+      "title": "System Settings",
+      "language": "Language",
+      "clearCache": "Clear Cache",
+      "theme": "Theme / Appearance",
+      "systemDefault": "System Default",
+      "notifications": "Notification Preferences",
+      "privacy": "Privacy Settings"
+    },
+    "logout": "Logout"
+  },
+  "tab": {
+    "home": "Home",
+    "pet": "Pet Report",
+    "history": "History",
+    "profile": "Profile"
+  },
+  "nav": {
+    "home": "Home",
+    "health": "Health Records",
+    "pet": "Pet Report",
+    "history": "History",
+    "profile": "Profile",
+    "login": "Phone Login",
+    "addPet": "Add Pet"
+  },
+  "health": {
+    "appTitle": "Health Records",
+    "titleWithName": "{name}'s Health Records",
+    "unnamedPet": "Unnamed Pet",
+    "trend": "Health Trend",
+    "lastTwoWeeks": "Last Two Weeks",
+    "visitFreq": "Visit Frequency",
+    "filter": {
+      "all": "All",
+      "vaccine": "Vaccine",
+      "visit": "Visit",
+      "exam": "Exam",
+      "filter": "Filter"
+    },
+    "group": {
+      "done": "Done",
+      "viewAll": "View All"
+    },
+    "modal": {
+      "filterSearch": "Filter & Search",
+      "searchPlaceholder": "Search keywords",
+      "pickDate": "Pick Date",
+      "prevPage": "Prev",
+      "nextPage": "Next",
+      "close": "Close"
+    },
+    "addModal": {
+      "title": "New Record",
+      "type": { "vaccine": "Vaccine", "visit": "Visit", "exam": "Exam" },
+      "pickDate": "Pick Date",
+      "summaryPlaceholder": "Enter summary (no sensitive info)",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "toast": {
+      "trendPoint": "Trend Point",
+      "freqBar": "Frequency Bar",
+      "added": "Added",
+      "enterSummary": "Please enter summary"
+    },
+    "notSet": "Not set"
   }
 }

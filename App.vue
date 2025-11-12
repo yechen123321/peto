@@ -29,7 +29,7 @@ export default {
           plus.runtime.restart()
           return
         }
-      } catch (e) {}
+      } catch (e) { }
       // #endif
       // #ifdef H5
       if (typeof location !== 'undefined' && location.reload) {
@@ -44,5 +44,5 @@ export default {
 </script>
 
 <style>
-	/*每个页面公共css */
+/*每个页面公共css */
 </style>
